@@ -3,6 +3,7 @@ import tokenModel from '../../models/tokenModel.js'
 import { sendMailer } from '../../utils/sendMailer.js'
 import { securePassword } from '../../utils/securePassword.js'
 import crypto from 'crypto'
+import jwt from 'jsonwebtoken'
 
 
 
@@ -34,14 +35,14 @@ export const insertUser = async (req,res) =>{
                     token:crypto.randomBytes(32).toString('hex')
                 }).save();
                 
-                const url = `${process.env.BASE_URL}/users/${userData._id}/verify/${token.token}`        
+                const url = `${process.env.BASE_URL}/home/${userData._id}/${token.token}`        
                 sendMailer(
                     userData.name,
                     userData.email,
                     url,
                     'Travello verify email'
                     )
-                res.status(200).json({message:'An email send to your account verify'})
+                res.status(200).json({status:true,message:'An email send to your account verify'})
             }else{
                 res.status(400).json({message:"can't registered, somthing went wroung" })
             }
@@ -56,12 +57,11 @@ export const insertUser = async (req,res) =>{
 
 export const verifyUser = async (req,res) =>{
     try{
-        console.log(req.params,'is working')
-        const userToken = await userModel.findOne({
-            toke:req.params.token,
+        const userToken = await tokenModel.findOne({
+            token:req.params.token,
             userId:req.params.id,
         })
-        console.log(userToken)
+        
         if(!userToken){
             return res.status(400).json({message:'Your verification link may have expired. Please click on resend for verify your Email.'})
         }else{
@@ -70,8 +70,6 @@ export const verifyUser = async (req,res) =>{
             })
             if(!user){
                 return res.status(400).json({message:'We were unable to find a user for this verification. Please SignUp!'})
-            }else if(user.is_verified){
-                return res.status(200).json({message:'User has been already verified. Please Login'})
             }else{
                 const update = await userModel.updateOne({
                     _id:req.params.id},{
@@ -80,7 +78,13 @@ export const verifyUser = async (req,res) =>{
                         }    
                     })
                 if(update){
-                    return res.status(200).json({message:'Your account has been successfully verified'})
+                    const userData = await userModel.findOne({_id:req.params.id})
+                    const usertoken = jwt.sign(
+                        { userId : userData._id },
+                         process.env.SECRET_KEY, 
+                         { expiresIn: '1h' }
+                        );
+                    return res.status(200).json({status:true,message:'Your account has been successfully verified',usertoken,userData})
                 }
             }
         }
