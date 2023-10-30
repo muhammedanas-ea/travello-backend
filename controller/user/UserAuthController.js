@@ -57,28 +57,30 @@ export const insertUser = async (req,res) =>{
 
 export const verifyUser = async (req,res) =>{
     try{
+        const token = req.params.token
+        const id = req.params.id
         const userToken = await tokenModel.findOne({
-            token:req.params.token,
-            userId:req.params.id,
+            token:token,
+            userId:id,
         })
         
         if(!userToken){
             return res.status(400).json({message:'Your verification link may have expired. Please click on resend for verify your Email.'})
         }else{
             const user = await userModel.findById({
-                _id:req.params.id
+                _id:id
             })
             if(!user){
                 return res.status(400).json({message:'We were unable to find a user for this verification. Please SignUp!'})
             }else{
                 const update = await userModel.updateOne({
-                    _id:req.params.id},{
+                    _id:id},{
                         $set:{
                             is_verified:true
                         }    
                     })
                 if(update){
-                    const userData = await userModel.findOne({_id:req.params.id})
+                    const userData = await userModel.findOne({_id:id})
                     const usertoken = jwt.sign(
                         { userId : userData._id },
                          process.env.SECRET_KEY, 

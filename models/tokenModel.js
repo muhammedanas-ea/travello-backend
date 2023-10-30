@@ -2,10 +2,9 @@ import mongoose from "mongoose";
 const { Schema } = mongoose
 
 const tokenSchema = new Schema({
-    userId : {
-        type: mongoose.Schema.Types.ObjectId,
-        required:true,
-        ref:"User",
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref:"users",
         unique:true
     },
     token: {
@@ -18,4 +17,7 @@ const tokenSchema = new Schema({
         expires:3600
     }
 })
-export default mongoose.model("token",tokenSchema)
+
+const tokens = mongoose.model("tokens", tokenSchema);
+
+export default tokens;
