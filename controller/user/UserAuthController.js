@@ -136,3 +136,35 @@ export const userLogin = async (req,res) =>{
         console.log(err)
     }
 }
+
+
+export const forgotPassword = async (req,res) =>{
+    try{
+        const {email} = req.body
+        const emailExist = await userModel.findOne({email:email})
+        if(!emailExist){
+            return res.status(400).json({message:'In this email do have an account'})
+        }else{
+            if(!emailExist.is_verified){
+                return res.status(400).json({message:'In your account not verified '})
+            }else{
+                const token = await new tokenModel({
+                    userId:emailExist._id,
+                    token:crypto.randomBytes(32).toString("hex")
+                }).save();
+                const url = `${process.env.BASE_URL}/resetPassword/${emailExist._id}/${token.token}` 
+                console.log(url);
+                sendMailer(
+                    emailExist.name,
+                    emailExist.email,
+                    url,
+                    'Travello reset password mail'
+                )
+                res.status(200).json({status:true,message:'Reset password verification email sent'})
+            }
+        }
+
+    }catch(err){
+        console.log(err)
+    }
+}
