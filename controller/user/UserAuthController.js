@@ -2,6 +2,7 @@ import userModel from '../../models/userModel.js'
 import tokenModel from '../../models/tokenModel.js'
 import { sendMailer } from '../../utils/sendMailer.js'
 import { securePassword } from '../../utils/securePassword.js'
+import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 
@@ -15,8 +16,6 @@ export const insertUser = async (req,res) =>{
         const sPassword = await securePassword(password)
         const emailExist = await userModel.findOne({email:email})
 
-        console.log(emailExist);
-
         if(emailExist){
             return res.status(400).json({message:'email all ready exist'})
         }else{
@@ -29,13 +28,16 @@ export const insertUser = async (req,res) =>{
                 is_verified:0,
             })
             const userData = await user.save()
+           
             if(userData){
+                const id = userData._id
                 const token = await new tokenModel({
-                    userId:userData._id,
-                    token:crypto.randomBytes(32).toString('hex')
+                    userId:id,
+                    token:crypto.randomBytes(32).toString("hex")
                 }).save();
                 
-                const url = `${process.env.BASE_URL}/home/${userData._id}/${token.token}`        
+                const url = `${process.env.BASE_URL}/home/${userData._id}/${token.token}` 
+
                 sendMailer(
                     userData.name,
                     userData.email,
@@ -57,36 +59,76 @@ export const insertUser = async (req,res) =>{
 
 export const verifyUser = async (req,res) =>{
     try{
-        const token = req.params.token
-        const id = req.params.id
-        const userToken = await tokenModel.findOne({
-            token:token,
-            userId:id,
-        })
-        
-        if(!userToken){
-            return res.status(400).json({message:'Your verification link may have expired. Please click on resend for verify your Email.'})
+        const verifyLink = await userModel.findOne({_id:req.params.id}) 
+        if(!verifyLink){
+            return res.status(400).json({message:'link is invalid'})
         }else{
-            const user = await userModel.findById({
-                _id:id
+            const userToken = await tokenModel.findOne({
+                token: req.params.token,
+                userId: verifyLink,
             })
-            if(!user){
-                return res.status(400).json({message:'We were unable to find a user for this verification. Please SignUp!'})
+            
+            if(!userToken){
+                return res.status(400).json({message:'Your verification link may have expired. Please click on resend for verify your Email.'})
             }else{
-                const update = await userModel.updateOne({
-                    _id:id},{
-                        $set:{
-                            is_verified:true
-                        }    
-                    })
-                if(update){
-                    const userData = await userModel.findOne({_id:id})
-                    const usertoken = jwt.sign(
-                        { userId : userData._id },
-                         process.env.SECRET_KEY, 
-                         { expiresIn: '1h' }
-                        );
-                    return res.status(200).json({status:true,message:'Your account has been successfully verified',usertoken,userData})
+                const user = await userModel.findById({
+                    _id:verifyLink._id,
+                })
+                if(!user){
+                    return res.status(400).json({message:'We were unable to find a user for this verification. Please SignUp!'})
+                }else{
+                    const update = await userModel.updateOne(
+                        { _id: verifyLink._id},{
+                            $set: {
+                                is_verified: true
+                            }    
+                        }
+                    )
+                    if(update){
+                        const userData = await userModel.findOne({ _id: verifyLink._id })
+                        const usertoken = jwt.sign(
+                            { userId : userData._id },
+                             process.env.SECRET_KEY, 
+                             { expiresIn: '1h' }
+                            );
+                        return res.status(200).json({status:true,message:'Your account has been successfully verified',usertoken,userData})
+                    }
+                }
+            }
+        }
+    }catch(err){
+        console.log(err)
+    }
+}
+
+
+// USER LOGIN VERIFICATION FUNCTION
+
+export const userLogin = async (req,res) =>{
+    try{
+        const emailExist = await userModel.findOne({email:req.body.email})
+        if(!emailExist){
+            return res.status(400).json({message:'enter email is incorrect'})
+        }else{
+            const passworMatch = await bcrypt.compare(req.body.password,emailExist.password)
+            console.log(passworMatch);
+            if(!passworMatch){
+                return res.status(400).json({message:'enter password is incorrect'})
+            }else{
+                if(emailExist.is_block){
+                    return res.status(400).json({message:'your account is blocked '})
+                }else{
+                    if(!emailExist.is_verified){
+                        return res.status(400).json({message:'your account not verified pleace sign up'})
+                    }else{
+                        const userData = emailExist
+                        const usertoken = jwt.sign(
+                            { userId : emailExist._id },
+                             process.env.SECRET_KEY, 
+                             { expiresIn: '1h' }
+                            );
+                        return res.status(200).json({status:true,message:'your login is completed successfully',usertoken,userData})
+                    }
                 }
             }
         }

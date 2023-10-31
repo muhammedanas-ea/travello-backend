@@ -35,12 +35,15 @@ const UsersSchema = new Schema({
   },
   is_block: {
     type: Boolean,
+    default:false,
   },
   is_verified: {
     type: Boolean,
+    default:false,
   },
   is_admin: {
     type: Boolean,
+    default:false,
   },
 });
 
