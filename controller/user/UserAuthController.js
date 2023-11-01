@@ -23,9 +23,6 @@ export const insertUser = async (req,res) =>{
                 name,
                 email,
                 password:sPassword,
-                is_admin:0,
-                is_block:0,
-                is_verified:0,
             })
             const userData = await user.save()
            
@@ -148,22 +145,48 @@ export const forgotPassword = async (req,res) =>{
             if(!emailExist.is_verified){
                 return res.status(400).json({message:'In your account not verified '})
             }else{
-                const token = await new tokenModel({
-                    userId:emailExist._id,
-                    token:crypto.randomBytes(32).toString("hex")
-                }).save();
+                const tokenExist = await tokenModel.findOne({ userId: emailExist._id });
+
+                const token = tokenExist || new tokenModel({
+                  userId: emailExist._id,
+                  token: crypto.randomBytes(32).toString('hex'),
+                });
+            
+                await token.save();
+            
                 const url = `${process.env.BASE_URL}/resetPassword/${emailExist._id}/${token.token}` 
-                console.log(url);
                 sendMailer(
                     emailExist.name,
                     emailExist.email,
                     url,
                     'Travello reset password mail'
                 )
+                console.log('token');
                 res.status(200).json({status:true,message:'Reset password verification email sent'})
             }
         }
+    }catch(err){
+        console.log(err)
+    }
+}
 
+
+export const  userRestPassword = async (req,res) =>{
+    try{
+        const { password,id } = req.body
+        const sPassword = await securePassword(password)
+        const resetData = await userModel.updateOne({_id:id},{$set:{password:sPassword}})
+        const userData = await userModel.findOne({_id:id})
+        if(!resetData){
+            res.status(400).json({message:'your reset password not completed'})
+        }else{
+            const usertoken = jwt.sign(
+                { userId : userData._id },
+                 process.env.SECRET_KEY, 
+                 { expiresIn: '1h' }
+                );
+            res.status(200).json({status:true,message:'reset password is completed',userData,usertoken})
+        }
     }catch(err){
         console.log(err)
     }

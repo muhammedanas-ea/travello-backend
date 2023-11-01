@@ -1,5 +1,5 @@
 import express from 'express'
-import { insertUser , verifyUser , userLogin , forgotPassword } from '../controller/user/UserAuthController.js';
+import { insertUser , verifyUser , userLogin , forgotPassword , userRestPassword} from '../controller/user/UserAuthController.js';
 
 
 const userRoute = express();
@@ -10,6 +10,7 @@ userRoute.post('/signup', insertUser)
 userRoute.get('/verify/:id/:token', verifyUser)
 userRoute.post('/login', userLogin)
 userRoute.post('/forgotPassword',forgotPassword)
+userRoute.post('/restPasword',userRestPassword)
 
 
 
