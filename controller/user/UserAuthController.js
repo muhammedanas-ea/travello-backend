@@ -165,7 +165,7 @@ export const userGoogleSignUp = async(req,res) =>{
                 {email:email},
                 {
                     $set:{
-                        googleSignup:true
+                        googleSignup:true,
                     }
                 }   
             )
