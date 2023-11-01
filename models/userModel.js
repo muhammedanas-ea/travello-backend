@@ -45,6 +45,10 @@ const UsersSchema = new Schema({
     type: Boolean,
     default:false,
   },
+  googleSignup: {
+    type: Boolean,
+    default:false,
+  }
 });
 
 const users = mongoose.model("users", UsersSchema);

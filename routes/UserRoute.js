@@ -1,5 +1,12 @@
 import express from 'express'
-import { insertUser , verifyUser , userLogin , forgotPassword , userRestPassword} from '../controller/user/UserAuthController.js';
+import {insertUser , 
+        verifyUser ,
+        userLogin ,
+        forgotPassword , 
+        userRestPassword,
+        userGoogleSignUp,
+        userGoogleSignin,
+     } from '../controller/user/UserAuthController.js';
 
 
 const userRoute = express();
@@ -11,6 +18,8 @@ userRoute.get('/verify/:id/:token', verifyUser)
 userRoute.post('/login', userLogin)
 userRoute.post('/forgotPassword',forgotPassword)
 userRoute.post('/restPasword',userRestPassword)
+userRoute.post('/googleSignUp',userGoogleSignUp)
+userRoute.post('/googleSignin',userGoogleSignin)
 
 
 

@@ -41,7 +41,10 @@ export const insertUser = async (req,res) =>{
                     url,
                     'Travello verify email'
                     )
-                res.status(200).json({status:true,message:'An email send to your account verify'})
+                res.status(200).json({
+                    status:true,
+                    message:'An email send to your account verify'
+                })
             }else{
                 res.status(400).json({message:"can't registered, somthing went wroung" })
             }
@@ -75,7 +78,8 @@ export const verifyUser = async (req,res) =>{
                     return res.status(400).json({message:'We were unable to find a user for this verification. Please SignUp!'})
                 }else{
                     const update = await userModel.updateOne(
-                        { _id: verifyLink._id},{
+                        { _id: verifyLink._id},
+                        {
                             $set: {
                                 is_verified: true
                             }    
@@ -88,7 +92,12 @@ export const verifyUser = async (req,res) =>{
                              process.env.SECRET_KEY, 
                              { expiresIn: '1h' }
                             );
-                        return res.status(200).json({status:true,message:'Your account has been successfully verified',usertoken,userData})
+                        return res.status(200).json({
+                            status:true,
+                            usertoken,
+                            userData,
+                            message:'Your account has been successfully verified'
+                        })
                     }
                 }
             }
@@ -108,7 +117,6 @@ export const userLogin = async (req,res) =>{
             return res.status(400).json({message:'enter email is incorrect'})
         }else{
             const passworMatch = await bcrypt.compare(req.body.password,emailExist.password)
-            console.log(passworMatch);
             if(!passworMatch){
                 return res.status(400).json({message:'enter password is incorrect'})
             }else{
@@ -124,13 +132,81 @@ export const userLogin = async (req,res) =>{
                              process.env.SECRET_KEY, 
                              { expiresIn: '1h' }
                             );
-                        return res.status(200).json({status:true,message:'your login is completed successfully',usertoken,userData})
+                        return res.status(200).json({
+                            status:true,
+                            usertoken,
+                            userData,
+                            message:'your login is completed successfully',
+                        })
                     }
                 }
             }
         }
     }catch(err){
         console.log(err)
+    }
+}
+
+
+export const userGoogleSignUp = async(req,res) =>{
+    try{
+        const { id, email, name } = req.body
+        const emailExist = await userModel.findOne({email:email})
+        if(emailExist){
+            res.status(400).json({message:'email already exist pleace login'})
+        }else{
+           const user = new userModel({
+            name:name,
+            email:email,
+            password:id
+           })
+           await user.save();
+           await userModel.updateOne(
+                {email:email},
+                {
+                    $set:{
+                        googleSignup:true
+                    }
+                }   
+            )
+           const usertoken = jwt.sign(
+            { userId : user._id },
+             process.env.SECRET_KEY, 
+             { expiresIn: '1h' }
+            );
+            return res.status(200).json({
+                status:true,
+                usertoken,
+                userData:user,
+                message:'Your google account has been successfully created'
+            })
+        }
+    }catch(err){
+        console.log(err);
+    }
+}
+
+
+export const userGoogleSignin = async (req,res) =>{
+    try{
+        const exist = await userModel.findOne({email:req.body.email})
+        if(!exist.googleSignup){
+            res.status(400).json({message:'don have account please sign up'})
+        }else{
+            const usertoken = jwt.sign(
+                { userId : exist._id },
+                 process.env.SECRET_KEY, 
+                 { expiresIn: '1h' }
+                );
+                return res.status(200).json({
+                    status:true,
+                    usertoken,
+                    userData:exist,
+                    message:'Your google sign in has been successfully completed'
+                })
+        }
+    }catch(err){
+        console.log(err);
     }
 }
 
@@ -146,14 +222,11 @@ export const forgotPassword = async (req,res) =>{
                 return res.status(400).json({message:'In your account not verified '})
             }else{
                 const tokenExist = await tokenModel.findOne({ userId: emailExist._id });
-
                 const token = tokenExist || new tokenModel({
                   userId: emailExist._id,
                   token: crypto.randomBytes(32).toString('hex'),
                 });
-            
                 await token.save();
-            
                 const url = `${process.env.BASE_URL}/resetPassword/${emailExist._id}/${token.token}` 
                 sendMailer(
                     emailExist.name,
@@ -161,8 +234,10 @@ export const forgotPassword = async (req,res) =>{
                     url,
                     'Travello reset password mail'
                 )
-                console.log('token');
-                res.status(200).json({status:true,message:'Reset password verification email sent'})
+                res.status(200).json({
+                    status:true,
+                    message:'Reset password verification email sent'
+                })
             }
         }
     }catch(err){
@@ -185,7 +260,12 @@ export const  userRestPassword = async (req,res) =>{
                  process.env.SECRET_KEY, 
                  { expiresIn: '1h' }
                 );
-            res.status(200).json({status:true,message:'reset password is completed',userData,usertoken})
+            res.status(200).json({
+                status:true,
+                userData,
+                usertoken,
+                message:'reset password is completed'
+            })
         }
     }catch(err){
         console.log(err)
