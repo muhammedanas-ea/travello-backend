@@ -6,7 +6,7 @@ import {insertUser ,
         userRestPassword,
         userGoogleSignUp,
         userGoogleSignin,
-     } from '../controller/user/UserAuthController.js';
+     } from '../controller/authController/UserAuthController.js';
 
 
 const userRoute = express();

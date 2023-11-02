@@ -3,6 +3,7 @@ import env from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
 import userRoute from "./routes/UserRoute.js";
+import adminRoute from './routes/AdminRoute.js'
 
 const app = express()
 
@@ -24,6 +25,7 @@ app.use(cors({
 
 //user Route adding sedction
 app.use('/',userRoute)
+app.use('/admin',adminRoute)
 
 
 const port = process.env.port || 3000
