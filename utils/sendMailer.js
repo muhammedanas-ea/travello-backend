@@ -23,13 +23,15 @@ export const sendMailer = async (name, email, url, text) => {
                     <p>Hi ${name}</p>
                     <p>
                         Thank you for choosing Travello. 
-                        This email is a verification message.
+                        This email is a forgot password verification message.
                         Please click the link below to verify your email.
                         The link will remain valid for 2 minutes.
                     </p>
                     <a href=${url}>Verify Email</a>
                 </div>`;
 
+  }else if(text === 'Travello property owner otp verification'){
+    content = `<p>Hi ${name}, this is travello signup verification  OTP: ${url}</p>`
   }
    
 
