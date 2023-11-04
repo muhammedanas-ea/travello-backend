@@ -22,6 +22,9 @@ const PropertyOwnerSchema = new Schema({
   ownerImage: {
     type: String,
   },
+  otp: {
+    type: Number,
+  }
 });
 
 const PropertyOwner = mongoose.model("PropertyOwner", PropertyOwnerSchema);
