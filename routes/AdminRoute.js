@@ -9,7 +9,7 @@ import {
 
 const adminRoute = express ()
 
-adminRoute.get('/userlist',userDetails)
+adminRoute.get('/userlist/:active/:search',userDetails)
 adminRoute.post('/adminLogin',adminLogin)
 adminRoute.put('/blockuser',userBlock)
 adminRoute.put('/ublockUser',userUnblock)

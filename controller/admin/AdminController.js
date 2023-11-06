@@ -3,13 +3,27 @@ import userModel from '../../models/userModel.js'
 
 export const userDetails = async (req,res) =>{
     try{
-        const userData = await userModel.find({is_verified:true})
+        const {active,search} = req.params
+        const page = (active - 1) * 6;
+        const query = {is_verified:true};
+
+        if (search != 0) {
+            query.$or = [
+              { name: { $regex: search, $options: "i" } },
+              { email: { $regex: search, $options: "i" } },
+            ];
+          }
+          const totalUser = await userModel.countDocuments(query);
+          const userData = await userModel.find(query).skip(page).limit(8).sort({'name':1});
+          const totalPages = Math.ceil(totalUser / 8);
+      
         if(!userData){
             res.status(200).json({status:false,message:'not exist useData'})
         }else{
             res.status(200).json({
                 status:true,
                 userData,
+                totalPages,
                 message:'user data sent'
             })
         }
