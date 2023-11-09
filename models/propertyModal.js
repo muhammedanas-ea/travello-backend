@@ -53,8 +53,17 @@ const PropertySchema = new Schema({
       required: true,
     },
   ],
-  Is_delete: {
+  Is_block: {
     type: Boolean,
+    default:false,
+  },
+  Is_approve: {
+    type: Boolean,
+    default: false,
+  },
+  Is_reject: {
+    type: Boolean,
+    default: false,
   },
   propertOwner:{
     type: Schema.Types.ObjectId,
