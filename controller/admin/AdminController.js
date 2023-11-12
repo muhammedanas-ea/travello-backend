@@ -1,5 +1,6 @@
 import userModel from "../../models/userModel.js";
 import propertyModel from "../../models/propertyModal.js";
+import { sendMailer } from "../../utils/sendMailer.js";
 
 export const userDetails = async (req, res) => {
   try {
@@ -159,6 +160,54 @@ export const propertUnBlock = async (req, res) => {
       res.status(200).json({
         status: true,
         message: "that property is unblocked",
+      });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const viewVerifyDetails = async (req, res) => {
+  try {
+    const propertyData = await propertyModel
+      .findOne({ _id: req.params.id })
+      .populate("propertOwner");
+    res.status(200).json({ propertyData });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const adminPropertyApprove = async (req, res) => {
+  try {
+    const { verify, id } = req.body;
+    if (verify) {
+      const updateApprove = await propertyModel
+        .findByIdAndUpdate({ _id: id }, { $set: { Is_approve: true } })
+        .populate("propertOwner");
+
+      sendMailer(
+        updateApprove.PropertyName,
+        updateApprove.propertOwner.email,
+        updateApprove.propertOwner.name,
+        "Travello admin approve property"
+      );
+      res.status(200).json({
+        message: "send a property approve mail",
+      });
+    } else {
+      const updateApprove = await propertyModel
+        .findByIdAndUpdate({ _id: id }, { $set: { Is_reject: true } })
+        .populate("propertOwner");
+
+      sendMailer(
+        updateApprove.PropertyName,
+        updateApprove.propertOwner.email,
+        updateApprove.propertOwner.name,
+        "Travello admin reject property"
+      );
+      res.status(200).json({
+        message: "send a property rejection mail",
       });
     }
   } catch (err) {

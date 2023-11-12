@@ -8,7 +8,14 @@ import {
   userGoogleSignUp,
   userGoogleSignin,
 } from "../controller/authController/UserAuthController.js";
-import { userPropertyList } from "../controller/user/UserController.js";
+import {
+  userPropertyList,
+  updateUserProfile,
+  fetchProfileData,
+  userSinglePropertyList
+} from "../controller/user/UserController.js";
+
+import { userAuth } from "../middleware/AuthMiddleware.js";
 
 const userRoute = express();
 
@@ -21,6 +28,10 @@ userRoute.post("/restPasword", userRestPassword);
 userRoute.post("/googleSignUp", userGoogleSignUp);
 userRoute.post("/googleSignin", userGoogleSignin);
 
-userRoute.get("/userpropertylist", userPropertyList);
+userRoute.put("/userprofile",userAuth,updateUserProfile);
+userRoute.get("/profileData/:id",userAuth,fetchProfileData)
+
+userRoute.get("/userpropertylist/:active/:sort", userPropertyList);
+userRoute.get("/singleproperty/:id",userSinglePropertyList);
 
 export default userRoute;

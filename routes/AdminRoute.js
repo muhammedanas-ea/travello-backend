@@ -7,7 +7,9 @@ import {
     verifyNotification,
     propertyDetails,
     propertBlock,
-    propertUnBlock
+    propertUnBlock,
+    viewVerifyDetails,
+    adminPropertyApprove
 } from '../controller/admin/AdminController.js'
 
 
@@ -21,9 +23,11 @@ adminRoute.put('/blockuser',userBlock)
 adminRoute.put('/ublockUser',userUnblock)
 
 adminRoute.get('/verify',verifyNotification)
+adminRoute.put('/adminapprove',adminPropertyApprove)
 
 adminRoute.get('/propertylistadmin/:active/:search',propertyDetails)
 adminRoute.put('/propertyBlock',propertBlock)
 adminRoute.put('/propertyUnblock',propertUnBlock)
+adminRoute.get('/viewDetails/:id',viewVerifyDetails)
 
 export default adminRoute

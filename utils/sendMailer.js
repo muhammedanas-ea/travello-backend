@@ -3,8 +3,8 @@ import nodemailer from "nodemailer";
 // SEND MAILER FUCTION SECTION
 
 export const sendMailer = async (name, email, url, text) => {
-  let content 
-  if(text === 'Travello verify email'){
+  let content;
+  if (text === "Travello verify email") {
     content = `<div>
                     <h1>Travello<h1>
                     <p>Hi ${name}</p>
@@ -16,9 +16,8 @@ export const sendMailer = async (name, email, url, text) => {
                     </p>
                     <a href=${url}>Verify Email</a>
                 </div>`;
-
-  }else if(text === 'Travello reset password mail'){
-     content = `<div>
+  } else if (text === "Travello reset password mail") {
+    content = `<div>
                     <h1>Travello<h1>
                     <p>Hi ${name}</p>
                     <p>
@@ -29,11 +28,13 @@ export const sendMailer = async (name, email, url, text) => {
                     </p>
                     <a href=${url}>Verify Email</a>
                 </div>`;
-
-  }else if(text === 'Travello property owner otp verification'){
-    content = `<p>Hi ${name}, this is travello signup verification  OTP: ${url}</p>`
+  } else if (text === "Travello property owner otp verification") {
+    content = `<p>Hi ${name}, this is travello signup verification  OTP: ${url}</p>`;
+  } else if (text === "Travello admin approve property") {
+    content = `<p>Hi ${url}, travello admin approve your ${name} property </p>`;
+  } else if (text === "Travello admin reject property") {
+    content = `<p>Hi ${url}, travello admin reject your ${name} property </p>`;
   }
-   
 
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",

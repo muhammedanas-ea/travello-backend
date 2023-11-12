@@ -27,12 +27,6 @@ const UsersSchema = new Schema({
   city: {
     type: String,
   },
-  postOffice: {
-    type: String,
-  },
-  pincode: {
-    type: Number,
-  },
   is_block: {
     type: Boolean,
     default:false,
