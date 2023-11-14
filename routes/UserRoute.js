@@ -32,6 +32,6 @@ userRoute.put("/userprofile",userAuth,updateUserProfile);
 userRoute.get("/profileData/:id",userAuth,fetchProfileData)
 
 userRoute.get("/userpropertylist/:active/:sort", userPropertyList);
-userRoute.get("/singleproperty/:id",userSinglePropertyList);
+userRoute.get("/singleproperty/:id",userAuth,userSinglePropertyList);
 
 export default userRoute;

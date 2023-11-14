@@ -72,5 +72,14 @@ export const ownerListProperty = async (req, res) => {
   }
 };
 
-
+export const propertyDetails = async (req,res) =>{
+  try{
+    const propertyData = await propertyModel
+      .findOne({ _id: req.params.id })
+      .populate("propertOwner");
+    res.status(200).json({ propertyData });
+  }catch(err){
+    console.log(err)
+  }
+} 
 

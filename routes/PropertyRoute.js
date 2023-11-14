@@ -4,7 +4,7 @@ import {
   ownerOtpVerification,
   propertyOwnerLogin,
 } from "../controller/authController/PropertyAuthController.js";
-import { addProperty , ownerListProperty } from "../controller/property/PropertyController.js";
+import { addProperty , ownerListProperty,propertyDetails } from "../controller/property/PropertyController.js";
 import upload from "../middleware/Multer.js";
 const propertyRoute = express();
 
@@ -15,5 +15,6 @@ propertyRoute.post("/propertySignin", propertyOwnerLogin);
 
 propertyRoute.post("/addProperty",upload.array("images",10),addProperty);
 propertyRoute.get("/listProperty/:id",ownerListProperty);
+propertyRoute.get("/propertydetails/:id",propertyDetails);
 
 export default propertyRoute;

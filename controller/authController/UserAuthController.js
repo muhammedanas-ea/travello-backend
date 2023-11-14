@@ -177,7 +177,7 @@ export const userGoogleSignUp = async (req, res) => {
         }
       );
       const usertoken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
-        expiresIn: "1h",
+        expiresIn: "24h",
       });
       return res.status(200).json({
         status: true,
