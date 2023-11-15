@@ -69,7 +69,11 @@ const PropertySchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'PropertyOwner',
     required: true,
-  }
+  },
+  bookings:[  {
+    type: Schema.Types.ObjectId,
+    ref: 'Bookings',
+  }]
 });
 
 const Property = mongoose.model("Property", PropertySchema);

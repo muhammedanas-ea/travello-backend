@@ -12,7 +12,8 @@ export const userAuth = async (req, res, next) => {
         if(user.is_block){
             return res.status(403).json({message: 'this user is blocked by admin'})
         }else{
-        next()
+          req.body.userId = dicode.userId 
+          next()
         }
     }
   } else {

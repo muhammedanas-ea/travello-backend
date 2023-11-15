@@ -1,5 +1,8 @@
 import propertyModel from "../../models/propertyModal.js";
 import usersModel from "../../models/userModel.js";
+import bookingModel from "../../models/bookingModal.js";
+import mongoose from "mongoose";
+const { ObjectId } = mongoose.Types;
 
 export const userPropertyList = async (req, res) => {
   try {
@@ -92,6 +95,47 @@ export const userSinglePropertyList = async (req, res) => {
       message: "singleproperty data get it",
       propertyData,
     });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const userBookingDetails = async (req, res) => {
+  try {
+    const {
+      totalAmount,
+      roomCount,
+      increment,
+      startDate,
+      endDate,
+      _id,
+      userId,
+    } = req.body;
+
+    const overlappingBookings = await bookingModel.aggregate([
+      {
+        $match: {
+          PropertyId: new ObjectId(_id),
+          $and: [
+            { ChekIn: { $lt: new Date(endDate) } },
+            { CheckOut: { $gt: new Date(startDate) } },
+          ],
+        },
+      },
+    ]);
+
+    console.log(overlappingBookings);
+
+    const booking = new bookingModel({
+      ChekIn: startDate,
+      CheckOut: endDate,
+      TotalGuest: increment,
+      TotalRooms: roomCount,
+      TotalRate: totalAmount,
+      PropertyId: _id,
+      UsersId: userId,
+    });
+    await booking.save();
   } catch (err) {
     console.log(err);
   }
