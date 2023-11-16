@@ -112,30 +112,52 @@ export const userBookingDetails = async (req, res) => {
       userId,
     } = req.body;
 
+    const propertyData = await propertyModel.findById(_id);
+
     const overlappingBookings = await bookingModel.aggregate([
       {
         $match: {
           PropertyId: new ObjectId(_id),
           $and: [
-            { ChekIn: { $lt: new Date(endDate) } },
-            { CheckOut: { $gt: new Date(startDate) } },
+            { ChekIn: { $lte: new Date(endDate) } },
+            { CheckOut: { $gte: new Date(startDate) } },
           ],
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalCount: { $sum: "$TotalRooms" },
         },
       },
     ]);
 
-    console.log(overlappingBookings);
-
-    const booking = new bookingModel({
-      ChekIn: startDate,
-      CheckOut: endDate,
-      TotalGuest: increment,
-      TotalRooms: roomCount,
-      TotalRate: totalAmount,
-      PropertyId: _id,
-      UsersId: userId,
-    });
-    await booking.save();
+    if (overlappingBookings.length > 0) {
+      const [{ totalCount }] = overlappingBookings;
+      if (totalCount + roomCount > propertyData.RoomCount) {
+        return res
+          .status(400)
+          .json({ message: "Room not available for these dates" });
+      }
+    }else {
+      const booking = new bookingModel({
+        ChekIn: startDate,
+        CheckOut: endDate,
+        TotalGuest: increment,
+        TotalRooms: roomCount,
+        TotalRate: totalAmount,
+        PropertyId: _id,
+        UsersId: userId,
+      });
+      await booking.save().then(() => {
+        return res
+          .status(200)
+          .json({
+            meessage: "room is available in this date",
+            id: booking._id,
+          });
+      });
+    }
   } catch (err) {
     console.log(err);
   }
