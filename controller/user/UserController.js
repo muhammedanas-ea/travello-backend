@@ -153,8 +153,10 @@ export const userBookingDetails = async (req, res) => {
         return res
           .status(200)
           .json({
+            status:true,
             meessage: "room is available in this date",
             id: booking._id,
+            totalAmount,
           });
       });
     }
