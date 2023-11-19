@@ -2,6 +2,7 @@ import propertyModel from "../../models/propertyModal.js";
 import usersModel from "../../models/userModel.js";
 import bookingModel from "../../models/bookingModal.js";
 import mongoose from "mongoose";
+import Stripe from "stripe";
 const { ObjectId } = mongoose.Types;
 
 export const userPropertyList = async (req, res) => {
@@ -139,28 +140,85 @@ export const userBookingDetails = async (req, res) => {
           .status(400)
           .json({ message: "Room not available for these dates" });
       }
-    }else {
-      const booking = new bookingModel({
-        ChekIn: startDate,
-        CheckOut: endDate,
-        TotalGuest: increment,
-        TotalRooms: roomCount,
-        TotalRate: totalAmount,
-        PropertyId: _id,
-        UsersId: userId,
-      });
-      await booking.save().then(() => {
-        return res
-          .status(200)
-          .json({
-            status:true,
-            meessage: "room is available in this date",
-            id: booking._id,
-            totalAmount,
-          });
-      });
     }
+    const booking = new bookingModel({
+      ChekIn: startDate,
+      CheckOut: endDate,
+      TotalGuest: increment,
+      TotalRooms: roomCount,
+      TotalRate: totalAmount,
+      PropertyId: _id,
+      UsersId: userId,
+    });
+    await booking.save().then(() => {
+      return res.status(200).json({
+        status: true,
+        meessage: "room is available in this date",
+        id: booking._id,
+        totalAmount,
+      });
+    });
   } catch (err) {
     console.log(err);
   }
 };
+
+export const userPaymentDetails = async (req, res) => {
+  try {
+    const stripe = new Stripe('sk_test_51ODm4bSHaENjV1jroo3TowfdHte8VmCm5hGFP5Llc0Gxzeh5sGAOo6gFGoDjFvFmeWXNLEd0yMOfIXj9KocfnBIO005dT0lJmM');
+    const booking = await bookingModel
+      .findById({ _id: req.params.bookingId })
+      .populate("PropertyId");
+     const totalAmount = booking.TotalRate * 100
+     console.log(totalAmount);
+    const paymentintent = await stripe.paymentIntents.create({
+      amount: totalAmount,
+      currency: "inr",
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
+
+    res
+      .status(200)
+      .json({
+        status: true,
+        message: "payment data",
+        booking,
+        clientSecret: paymentintent.client_secret,
+      });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
+
+// export const paymentSuccess = async (req, res) => {
+//   try {
+//     const stripe = new Stripe(process.env.STRIPE_KEY);
+//     const booking = await bookingModel
+//       .findById({ _id: req.params.bookingId })
+//       .populate("PropertyId");
+//      const totalAmount = booking.TotalRate * 100
+//      console.log(totalAmount);
+//     const paymentintent = await stripe.paymentIntents.create({
+//       amount: booking.TotalRate * 100,
+//       currency: "inr",
+//       automatic_payment_methods: {
+//         enabled: true,
+//       },
+//     });
+
+//     res
+//       .status(200)
+//       .json({
+//         status: true,
+//         message: "payment data",
+//         clientSecret: paymentintent.client_secret,
+//       });
+//   } catch (err) {
+//     console.log(err);
+//   }
+// };
+

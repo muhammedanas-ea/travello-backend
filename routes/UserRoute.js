@@ -13,7 +13,9 @@ import {
   updateUserProfile,
   fetchProfileData,
   userSinglePropertyList,
-  userBookingDetails
+  userBookingDetails,
+  userPaymentDetails,
+  // paymentSuccess
 } from "../controller/user/UserController.js";
 
 import { userAuth } from "../middleware/AuthMiddleware.js";
@@ -36,5 +38,7 @@ userRoute.get("/userpropertylist/:active/:sort", userPropertyList);
 userRoute.get("/singleproperty/:id",userAuth,userSinglePropertyList);
 
 userRoute.post('/bookings',userAuth,userBookingDetails)
+userRoute.get('/paymentdetails/:bookingId',userAuth,userPaymentDetails)
+// userRoute.post('/paymentSuccess',userAuth,paymentSuccess)
 
 export default userRoute;
