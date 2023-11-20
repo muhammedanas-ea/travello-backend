@@ -15,7 +15,8 @@ import {
   userSinglePropertyList,
   userBookingDetails,
   userPaymentDetails,
-  // paymentSuccess
+  paymentSuccess,
+  CheckingDetails
 } from "../controller/user/UserController.js";
 
 import { userAuth } from "../middleware/AuthMiddleware.js";
@@ -39,6 +40,8 @@ userRoute.get("/singleproperty/:id",userAuth,userSinglePropertyList);
 
 userRoute.post('/bookings',userAuth,userBookingDetails)
 userRoute.get('/paymentdetails/:bookingId',userAuth,userPaymentDetails)
-// userRoute.post('/paymentSuccess',userAuth,paymentSuccess)
+userRoute.put('/paymentSuccess',userAuth,paymentSuccess)
+
+userRoute.post('/checkuserdetails',CheckingDetails)
 
 export default userRoute;

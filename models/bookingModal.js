@@ -10,9 +10,6 @@ const BookingsSchema = new Schema({
     type: Date,
   },
   Address: {
-    City: {
-      type: String,
-    },
     Email: {
       type: String,
     },

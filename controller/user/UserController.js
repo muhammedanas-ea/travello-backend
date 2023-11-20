@@ -165,12 +165,13 @@ export const userBookingDetails = async (req, res) => {
 
 export const userPaymentDetails = async (req, res) => {
   try {
-    const stripe = new Stripe('sk_test_51ODm4bSHaENjV1jroo3TowfdHte8VmCm5hGFP5Llc0Gxzeh5sGAOo6gFGoDjFvFmeWXNLEd0yMOfIXj9KocfnBIO005dT0lJmM');
+    const stripe = new Stripe(
+      "sk_test_51ODm4bSHaENjV1jroo3TowfdHte8VmCm5hGFP5Llc0Gxzeh5sGAOo6gFGoDjFvFmeWXNLEd0yMOfIXj9KocfnBIO005dT0lJmM"
+    );
     const booking = await bookingModel
       .findById({ _id: req.params.bookingId })
       .populate("PropertyId");
-     const totalAmount = booking.TotalRate * 100
-     console.log(totalAmount);
+    const totalAmount = booking.TotalRate * 100;
     const paymentintent = await stripe.paymentIntents.create({
       amount: totalAmount,
       currency: "inr",
@@ -179,46 +180,46 @@ export const userPaymentDetails = async (req, res) => {
       },
     });
 
-    res
-      .status(200)
-      .json({
-        status: true,
-        message: "payment data",
-        booking,
-        clientSecret: paymentintent.client_secret,
-      });
+    res.status(200).json({
+      status: true,
+      message: "payment data",
+      booking,
+      clientSecret: paymentintent.client_secret,
+    });
   } catch (err) {
     console.log(err);
   }
 };
 
+export const paymentSuccess = async (req, res) => {
+  try {
+    const update = await bookingModel.findOneAndUpdate(
+      { _id: req.body.bookData.bookingId },
+      { $set: { bookingStatus: "success" } }
+    );
+    res.status(200).json({ status: true, message: "update completed" });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-
-// export const paymentSuccess = async (req, res) => {
-//   try {
-//     const stripe = new Stripe(process.env.STRIPE_KEY);
-//     const booking = await bookingModel
-//       .findById({ _id: req.params.bookingId })
-//       .populate("PropertyId");
-//      const totalAmount = booking.TotalRate * 100
-//      console.log(totalAmount);
-//     const paymentintent = await stripe.paymentIntents.create({
-//       amount: booking.TotalRate * 100,
-//       currency: "inr",
-//       automatic_payment_methods: {
-//         enabled: true,
-//       },
-//     });
-
-//     res
-//       .status(200)
-//       .json({
-//         status: true,
-//         message: "payment data",
-//         clientSecret: paymentintent.client_secret,
-//       });
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
-
+export const CheckingDetails = async (req, res) => {
+  try {
+    const { name, email, number, bookingData } = req.body;
+    const update = await bookingModel.findByIdAndUpdate(
+      { _id: bookingData },
+      {
+        $set: {
+          "Address.Name": name,
+          "Address.Email": email,
+          "Address.Mobile": number,
+        },
+      },{
+        new : true
+      }
+    );
+   res.status(200).json({status:true})
+  } catch (err) {
+    console.log(err);
+  }
+};
