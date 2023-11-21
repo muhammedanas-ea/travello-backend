@@ -197,6 +197,10 @@ export const paymentSuccess = async (req, res) => {
       { _id: req.body.bookData.bookingId },
       { $set: { bookingStatus: "success" } }
     );
+    await propertyModel.updateOne(
+      { _id: update.PropertyId },
+      { $addToSet: { bookings: update._id } }
+    );
     res.status(200).json({ status: true, message: "update completed" });
   } catch (err) {
     console.log(err);
@@ -214,11 +218,12 @@ export const CheckingDetails = async (req, res) => {
           "Address.Email": email,
           "Address.Mobile": number,
         },
-      },{
-        new : true
+      },
+      {
+        new: true,
       }
     );
-   res.status(200).json({status:true})
+    res.status(200).json({ status: true });
   } catch (err) {
     console.log(err);
   }

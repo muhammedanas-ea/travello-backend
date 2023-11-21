@@ -83,3 +83,11 @@ export const propertyDetails = async (req,res) =>{
   }
 } 
 
+export const bookingDetails = async (req,res) =>{
+  try{
+     const bookingData = await propertyModel.find({propertOwner:req.params.id}).populate('bookings')
+     res.status(200).json(bookingData)
+  }catch(err){
+    console.log(err)
+  }
+}
