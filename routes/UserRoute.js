@@ -16,7 +16,8 @@ import {
   userBookingDetails,
   userPaymentDetails,
   paymentSuccess,
-  CheckingDetails
+  CheckingDetails,
+  BookingSummeryDetails
 } from "../controller/user/UserController.js";
 
 import { userAuth } from "../middleware/AuthMiddleware.js";
@@ -43,5 +44,6 @@ userRoute.get('/paymentdetails/:bookingId',userAuth,userPaymentDetails)
 userRoute.put('/paymentSuccess',userAuth,paymentSuccess)
 
 userRoute.post('/checkuserdetails',CheckingDetails)
+userRoute.get('/bookingsummery/:id',BookingSummeryDetails)
 
 export default userRoute;

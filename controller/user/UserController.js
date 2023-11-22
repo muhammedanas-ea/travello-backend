@@ -228,3 +228,15 @@ export const CheckingDetails = async (req, res) => {
     console.log(err);
   }
 };
+
+export const BookingSummeryDetails = async (req, res) => {
+  try {
+    const bookingSummeryData = await bookingModel
+      .find({ UsersId: req.params.id })
+      .sort({ ChekIn: -1 })
+      .populate("PropertyId");
+    return res.status(200).json(bookingSummeryData);
+  } catch (err) {
+    console.log(err);
+  }
+};

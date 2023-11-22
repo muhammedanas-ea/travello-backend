@@ -1,5 +1,7 @@
 import propertyModel from "../../models/propertyModal.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+const { ObjectId } = mongoose.Types;
 
 export const addProperty = async (req, res) => {
   try {
@@ -72,22 +74,51 @@ export const ownerListProperty = async (req, res) => {
   }
 };
 
-export const propertyDetails = async (req,res) =>{
-  try{
+export const propertyDetails = async (req, res) => {
+  try {
     const propertyData = await propertyModel
       .findOne({ _id: req.params.id })
       .populate("propertOwner");
     res.status(200).json({ propertyData });
-  }catch(err){
-    console.log(err)
+  } catch (err) {
+    console.log(err);
   }
-} 
+};
 
-export const bookingDetails = async (req,res) =>{
-  try{
-     const bookingData = await propertyModel.find({propertOwner:req.params.id}).populate('bookings')
-     res.status(200).json(bookingData)
-  }catch(err){
-    console.log(err)
+export const bookingDetails = async (req, res) => {
+  try {
+    const bookingData = await propertyModel.aggregate([
+      {
+        $match: {
+          propertOwner: new ObjectId(req.params.id),
+        },
+      },
+      {
+        $lookup: {
+          from: "bookings",
+          localField: "bookings",
+          foreignField: "_id",
+          as: "details",
+        },
+      },
+      {
+        $unwind: {
+          path: "$details",
+        },
+      },
+      {
+        $project: {
+          PropertyName: 1,
+          details: 1,
+          _id: 0,
+        },
+      },
+      {
+        $sort: { "details.ChekIn": -1 },
+      },
+    ]);
+    res.status(200).json(bookingData);
+  } catch (err) {
+    console.log(err);
   }
-}
+};
