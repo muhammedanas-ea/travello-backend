@@ -7,10 +7,32 @@ const { ObjectId } = mongoose.Types;
 
 export const userPropertyList = async (req, res) => {
   try {
-    const { active, sort } = req.params;
+    const { active, sort, aminitesSort, search, priceFilter } = req.params;
     const page = (active - 1) * 6;
-    const query = { Is_approve: true, Is_block: false };
     let sortValue;
+    let array = [];
+
+    const amenities = JSON.parse(aminitesSort);
+
+    amenities.map((item) => {
+      array.push(item.value);
+    });
+
+    const query = { Is_approve: true, Is_block: false };
+
+    if (search != 0) {
+      query.$or = [
+        { PropertyName: { $regex: search, $options: "i" } },
+        { City: { $regex: search, $options: "i" } },
+        { State: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    if (Array.isArray(array) && array.length > 0) {
+      query.Amenities = { $all: array };
+    }
+
+    query.Price = { $gt: priceFilter };
 
     if (sort === "highToLow") {
       sortValue = -1;
@@ -25,6 +47,7 @@ export const userPropertyList = async (req, res) => {
       .skip(page)
       .limit(9)
       .sort({ Price: sortValue });
+
     const totalPages = Math.ceil(totalProperty / 9);
 
     if (!propertyData) {
