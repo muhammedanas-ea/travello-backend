@@ -1,9 +1,10 @@
 import propertyModel from "../../models/propertyModal.js";
+import bookingModel from '../../models/bookingModal.js'
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 
-export const addProperty = async (req, res) => {
+export const addProperty = async (req, res,next) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     const dicout = jwt.verify(token, process.env.SECRET_KEY);
@@ -51,11 +52,11 @@ export const addProperty = async (req, res) => {
         .json({ status: true, message: "property add complted" });
     }
   } catch (err) {
-    console.log(err);
+   next(err);
   }
 };
 
-export const ownerListProperty = async (req, res) => {
+export const ownerListProperty = async (req, res,next) => {
   try {
     const propertyData = await propertyModel
       .find({ propertOwner: req.params.id })
@@ -70,27 +71,33 @@ export const ownerListProperty = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const propertyDetails = async (req, res) => {
+export const propertyDetails = async (req, res,next) => {
   try {
     const propertyData = await propertyModel
       .findOne({ _id: req.params.id })
       .populate("propertOwner");
     res.status(200).json({ propertyData });
   } catch (err) {
-    console.log(err);
+   next(err);
   }
 };
 
-export const bookingDetails = async (req, res) => {
+export const bookingDetails = async (req, res,next) => {
   try {
+    const {active,id} = req.params
+    const page = (active - 1) * 6;
+      const totalProperty = await bookingModel.countDocuments({
+      bookingStatus: { $in: ['success', 'cancel'] }
+    });
+
     const bookingData = await propertyModel.aggregate([
       {
         $match: {
-          propertOwner: new ObjectId(req.params.id),
+          propertOwner: new ObjectId(id),
         },
       },
       {
@@ -114,11 +121,18 @@ export const bookingDetails = async (req, res) => {
         },
       },
       {
-        $sort: { "details.ChekIn": -1 },
+        $sort: { "details.Date": -1 },
       },
+      {
+        $skip:page
+      },
+      {
+        $limit:8
+      }
     ]);
-    res.status(200).json(bookingData);
+    const totalPages = Math.ceil(totalProperty / 8);
+    res.status(200).json({bookingData,totalPages});
   } catch (err) {
-    console.log(err);
+   next(err);
   }
 };

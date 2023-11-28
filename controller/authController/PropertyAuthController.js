@@ -4,7 +4,7 @@ import { securePassword } from "../../utils/securePassword.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-export const insertPropertyOwner = async (req, res) => {
+export const insertPropertyOwner = async (req, res,next) => {
   try {
     const { email, name, number, password } = req.body;
     const sPassword = await securePassword(password);
@@ -49,11 +49,11 @@ export const insertPropertyOwner = async (req, res) => {
       }
     }
   } catch (err) {
-    console.log(err);
+    next(err)
   }
 };
 
-export const ownerOtpVerification = async (req, res) => {
+export const ownerOtpVerification = async (req, res,next) => {
   try {
     const verifyOtp = await ownerModel.findOne({ _id: req.body.id });
     if (verifyOtp.otp != req.body.otp) {
@@ -74,11 +74,11 @@ export const ownerOtpVerification = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const propertyOwnerLogin = async (req, res) => {
+export const propertyOwnerLogin = async (req, res,next ) => {
   try {
     const { email, password } = req.body;
     const emailExist = await ownerModel.findOne({ email: email });
@@ -109,6 +109,6 @@ export const propertyOwnerLogin = async (req, res) => {
       }
     }
   } catch (err) {
-    console.log(err);
+   next(err);
   }
 };

@@ -31,6 +31,9 @@ const UsersSchema = new Schema({
     type: Boolean,
     default:false,
   },
+  wallet:{
+    type: Number,
+  },
   is_verified: {
     type: Boolean,
     default:false,

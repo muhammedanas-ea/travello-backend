@@ -33,6 +33,13 @@ const BookingsSchema = new Schema({
     type: String,
     default: "pending",
   },
+  paymentMethode:{
+    type: String,
+    default: 'online'
+  },
+  Date:{
+    type: Date
+  },
   PropertyId: {
     type: Schema.Types.ObjectId,
     ref: "Property",

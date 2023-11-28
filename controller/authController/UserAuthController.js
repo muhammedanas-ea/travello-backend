@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 
 // INSERT USER SIGN UP DETAILS
 
-export const insertUser = async (req, res) => {
+export const insertUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
     const sPassword = await securePassword(password);
@@ -45,13 +45,13 @@ export const insertUser = async (req, res) => {
       }
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
 // USER EMAIL VERIFICATION FUNCTION
 
-export const verifyUser = async (req, res) => {
+export const verifyUser = async (req, res, next) => {
   try {
     const verifyLink = await userModel.findOne({ _id: req.params.id });
     if (!verifyLink) {
@@ -63,23 +63,19 @@ export const verifyUser = async (req, res) => {
       });
 
       if (!userToken) {
-        return res
-          .status(400)
-          .json({
-            message:
-              "Your verification link may have expired. Please click on resend for verify your Email.",
-          });
+        return res.status(400).json({
+          message:
+            "Your verification link may have expired. Please click on resend for verify your Email.",
+        });
       } else {
         const user = await userModel.findById({
           _id: verifyLink._id,
         });
         if (!user) {
-          return res
-            .status(400)
-            .json({
-              message:
-                "We were unable to find a user for this verification. Please SignUp!",
-            });
+          return res.status(400).json({
+            message:
+              "We were unable to find a user for this verification. Please SignUp!",
+          });
         } else {
           const update = await userModel.updateOne(
             { _id: verifyLink._id },
@@ -107,13 +103,13 @@ export const verifyUser = async (req, res) => {
       }
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
 // USER LOGIN VERIFICATION FUNCTION
 
-export const userLogin = async (req, res) => {
+export const userLogin = async (req, res, next) => {
   try {
     const emailExist = await userModel.findOne({ email: req.body.email });
     if (!emailExist) {
@@ -151,11 +147,11 @@ export const userLogin = async (req, res) => {
       }
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const userGoogleSignUp = async (req, res) => {
+export const userGoogleSignUp = async (req, res, next) => {
   try {
     const { id, email, name } = req.body;
     const emailExist = await userModel.findOne({ email: email });
@@ -187,11 +183,11 @@ export const userGoogleSignUp = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const userGoogleSignin = async (req, res) => {
+export const userGoogleSignin = async (req, res, next) => {
   try {
     const exist = await userModel.findOne({ email: req.body.email });
     if (!exist.googleSignup) {
@@ -210,11 +206,11 @@ export const userGoogleSignin = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     const emailExist = await userModel.findOne({ email: email });
@@ -250,11 +246,11 @@ export const forgotPassword = async (req, res) => {
       }
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const userRestPassword = async (req, res) => {
+export const userRestPassword = async (req, res, next) => {
   try {
     const { password, id } = req.body;
     const sPassword = await securePassword(password);
@@ -279,6 +275,6 @@ export const userRestPassword = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };

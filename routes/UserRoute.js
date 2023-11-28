@@ -17,10 +17,12 @@ import {
   userPaymentDetails,
   paymentSuccess,
   CheckingDetails,
-  BookingSummeryDetails
+  BookingSummeryDetails,
+  CancelBooking,
+  WalletPayment
 } from "../controller/user/UserController.js";
-
 import { userAuth } from "../middleware/AuthMiddleware.js";
+import { errorHandler } from "../middleware/ErrorHandling.js";
 
 const userRoute = express();
 
@@ -43,7 +45,12 @@ userRoute.post('/bookings',userAuth,userBookingDetails)
 userRoute.get('/paymentdetails/:bookingId',userAuth,userPaymentDetails)
 userRoute.put('/paymentSuccess',userAuth,paymentSuccess)
 
-userRoute.post('/checkuserdetails',CheckingDetails)
-userRoute.get('/bookingsummery/:id',BookingSummeryDetails)
+userRoute.post('/checkuserdetails',userAuth,CheckingDetails)
+userRoute.get('/bookingsummery/:id/:active',userAuth,BookingSummeryDetails)
+
+userRoute.post('/bookingcancel',userAuth,CancelBooking)
+userRoute.post('/walletpayment',userAuth,WalletPayment)
+
+userRoute.use(errorHandler);
 
 export default userRoute;
