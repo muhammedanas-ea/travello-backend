@@ -175,13 +175,28 @@ export const userBookingDetails = async (req, res, next) => {
       UsersId: userId,
       Date: new Date(),
     });
-    await booking.save().then(() => {
-      return res.status(200).json({
-        status: true,
-        meessage: "room is available in this date",
-        id: booking._id,
-        totalAmount,
-      });
+    await booking.save();
+
+    const userData = await usersModel.findOne({ _id: userId });
+
+    await bookingModel.findByIdAndUpdate(
+      { _id: booking._id },
+      {
+        $set: {
+          "Address.Name": userData.name,
+          "Address.Email": userData.email,
+          "Address.Mobile": userData.number,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    return res.status(200).json({
+      status: true,
+      meessage: "room is available in this date",
+      id: booking._id,
+      totalAmount,
     });
   } catch (err) {
     next(err);
@@ -234,43 +249,21 @@ export const paymentSuccess = async (req, res, next) => {
   }
 };
 
-export const CheckingDetails = async (req, res, next) => {
-  try {
-    const { name, email, number, bookingData } = req.body;
-    await bookingModel.findByIdAndUpdate(
-      { _id: bookingData },
-      {
-        $set: {
-          "Address.Name": name,
-          "Address.Email": email,
-          "Address.Mobile": number,
-        },
-      },
-      {
-        new: true,
-      }
-    );
-    res.status(200).json({ status: true });
-  } catch (err) {
-    next(err);
-  }
-};
-
 export const BookingSummeryDetails = async (req, res, next) => {
   try {
     const { active, id } = req.params;
-    const page = (active - 1) * 6;
+    const page = (active - 1) * 5;
     const totalBooking = await bookingModel.countDocuments({
       UsersId: id,
-      bookingStatus: "success",
+      bookingStatus: { $in: ["success", "cancel"] },
     });
     const bookingSummeryData = await bookingModel
       .find({ UsersId: id, bookingStatus: { $in: ["success", "cancel"] } })
       .sort({ Date: -1 })
       .skip(page)
-      .limit(4)
+      .limit(5)
       .populate("PropertyId");
-    const totalPages = Math.ceil(totalBooking / 4);
+    const totalPages = Math.ceil(totalBooking / 5);
     return res.status(200).json({ bookingSummeryData, totalPages });
   } catch (err) {
     console.log(err);
@@ -325,6 +318,20 @@ export const WalletPayment = async (req, res) => {
       { $addToSet: { bookings: update._id } }
     );
     res.status(200).json({ status: true, message: "update completed" });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const BookingCompleted = async (req, res) => {
+  try {
+    const bookingData = await bookingModel
+      .findOne({
+        _id: req.params.bookingId,
+        bookingStatus: { $in: ["success", "cancel"] },
+      })
+      .populate("PropertyId");
+    res.status(200).json(bookingData);
   } catch (err) {
     console.log(err);
   }

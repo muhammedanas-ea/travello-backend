@@ -16,10 +16,10 @@ import {
   userBookingDetails,
   userPaymentDetails,
   paymentSuccess,
-  CheckingDetails,
   BookingSummeryDetails,
   CancelBooking,
-  WalletPayment
+  WalletPayment,
+  BookingCompleted
 } from "../controller/user/UserController.js";
 import { userAuth } from "../middleware/AuthMiddleware.js";
 import { errorHandler } from "../middleware/ErrorHandling.js";
@@ -44,12 +44,10 @@ userRoute.get("/singleproperty/:id",userAuth,userSinglePropertyList);
 userRoute.post('/bookings',userAuth,userBookingDetails)
 userRoute.get('/paymentdetails/:bookingId',userAuth,userPaymentDetails)
 userRoute.put('/paymentSuccess',userAuth,paymentSuccess)
-
-userRoute.post('/checkuserdetails',userAuth,CheckingDetails)
 userRoute.get('/bookingsummery/:id/:active',userAuth,BookingSummeryDetails)
-
 userRoute.post('/bookingcancel',userAuth,CancelBooking)
 userRoute.post('/walletpayment',userAuth,WalletPayment)
+userRoute.get('/bookingcompleted/:bookingId',userAuth,BookingCompleted)
 
 userRoute.use(errorHandler);
 

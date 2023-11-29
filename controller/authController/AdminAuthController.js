@@ -6,11 +6,11 @@ export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
     const emailExist = await userModel.findOne({ email: email });
-    if (!emailExist.is_admin) {
-      return res.status(400).json({ message: "your not an admin" });
+    if (!emailExist) {
+      return res.status(400).json({ message: "email not exist " });
     } else {
-      if (!emailExist) {
-        return res.status(400).json({ message: "email not exist " });
+      if (!emailExist.is_admin) {
+        return res.status(400).json({ message: "your not an admin" });
       } else {
         const passwordMatch = await bycrpt.compare(
           password,
