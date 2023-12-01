@@ -4,7 +4,7 @@ import {
   ownerOtpVerification,
   propertyOwnerLogin,
 } from "../controller/authController/PropertyAuthController.js";
-import { addProperty , ownerListProperty,propertyDetails ,bookingDetails} from "../controller/property/PropertyController.js";
+import { addProperty , ownerListProperty,propertyDetails ,bookingDetails,editPropertyDetails} from "../controller/property/PropertyController.js";
 import { errorHandler } from "../middleware/ErrorHandling.js";
 import { propertOwnerAuth } from "../middleware/AuthMiddleware.js";
 import upload from "../middleware/Multer.js";
@@ -16,6 +16,7 @@ propertyRoute.post("/propertySignin", propertyOwnerLogin);
 
 
 propertyRoute.post("/addProperty",propertOwnerAuth,upload.array("images",10),addProperty);
+propertyRoute.post("/editProperty",propertOwnerAuth,editPropertyDetails);
 propertyRoute.get("/listProperty/:id",propertOwnerAuth,ownerListProperty);
 propertyRoute.get("/propertydetails/:id",propertOwnerAuth,propertyDetails);
 propertyRoute.get("/bookingdetails/:id/:active",propertOwnerAuth,bookingDetails);

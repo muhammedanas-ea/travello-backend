@@ -1,10 +1,10 @@
 import propertyModel from "../../models/propertyModal.js";
-import bookingModel from '../../models/bookingModal.js'
+import bookingModel from "../../models/bookingModal.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 
-export const addProperty = async (req, res,next) => {
+export const addProperty = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     const dicout = jwt.verify(token, process.env.SECRET_KEY);
@@ -52,11 +52,11 @@ export const addProperty = async (req, res,next) => {
         .json({ status: true, message: "property add complted" });
     }
   } catch (err) {
-   next(err);
+    next(err);
   }
 };
 
-export const ownerListProperty = async (req, res,next) => {
+export const ownerListProperty = async (req, res, next) => {
   try {
     const propertyData = await propertyModel
       .find({ propertOwner: req.params.id })
@@ -75,23 +75,23 @@ export const ownerListProperty = async (req, res,next) => {
   }
 };
 
-export const propertyDetails = async (req, res,next) => {
+export const propertyDetails = async (req, res, next) => {
   try {
     const propertyData = await propertyModel
       .findOne({ _id: req.params.id })
       .populate("propertOwner");
     res.status(200).json({ propertyData });
   } catch (err) {
-   next(err);
+    next(err);
   }
 };
 
-export const bookingDetails = async (req, res,next) => {
+export const bookingDetails = async (req, res, next) => {
   try {
-    const {active,id} = req.params
+    const { active, id } = req.params;
     const page = (active - 1) * 6;
-      const totalProperty = await bookingModel.countDocuments({
-      bookingStatus: { $in: ['success', 'cancel'] }
+    const totalProperty = await bookingModel.countDocuments({
+      bookingStatus: { $in: ["success", "cancel"] },
     });
 
     const bookingData = await propertyModel.aggregate([
@@ -124,15 +124,53 @@ export const bookingDetails = async (req, res,next) => {
         $sort: { "details.Date": -1 },
       },
       {
-        $skip:page
+        $skip: page,
       },
       {
-        $limit:8
-      }
+        $limit: 8,
+      },
     ]);
     const totalPages = Math.ceil(totalProperty / 8);
-    res.status(200).json({bookingData,totalPages});
+    res.status(200).json({ bookingData, totalPages });
   } catch (err) {
-   next(err);
+    next(err);
+  }
+};
+
+export const editPropertyDetails = async (req, res, next) => {
+  try {
+    const {
+      propertyId,
+      propertyName,
+      price,
+      room,
+      gust,
+      state,
+      location,
+      propertyType,
+      number,
+      describe,
+      amenities,
+    } = req.body;
+   await propertyModel.updateOne(
+      { _id: propertyId },
+      {
+        $set: {
+          PropertyName:propertyName,
+          Price:price,
+          RoomCount:room,
+          GuestCount:gust,
+          State:state,
+          City:location,
+          PropertyType:propertyType,
+          MobileNumber:number,
+          Description:describe,
+          Amenities:amenities,
+        },
+      }
+    );
+    res.status(200).json({message:'property edit completed'})
+  } catch (err) {
+    next(err);
   }
 };
