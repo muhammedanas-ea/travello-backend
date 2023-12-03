@@ -20,6 +20,9 @@ const BookingsSchema = new Schema({
       type: String,
     },
   },
+  TransactionId:{
+    type: String,
+  },
   TotalGuest: {
     type: Number,
   },

@@ -221,6 +221,11 @@ export const userPaymentDetails = async (req, res, next) => {
       },
     });
 
+    await bookingModel.updateOne(
+      { _id: req.params.bookingId },
+      { $set: { TransactionId: paymentintent.id } }
+    );
+
     res.status(200).json({
       status: true,
       message: "payment data",
@@ -285,7 +290,7 @@ export const CancelBooking = async (req, res) => {
       await usersModel.updateOne({ _id: userId }, { $set: { wallet: c } });
       await bookingModel.findOneAndUpdate(
         { _id: bookingId },
-        { $set: { bookingStatus: "cancel", paymentMethode: "wallet" } }
+        { $set: { bookingStatus: "cancel" } }
       );
       res
         .status(200)
@@ -308,7 +313,13 @@ export const WalletPayment = async (req, res) => {
     }
     const update = await bookingModel.findOneAndUpdate(
       { _id: bookingId },
-      { $set: { bookingStatus: "success" } }
+      {
+        $set: {
+          bookingStatus: "success",
+          TransactionId: bookingId,
+          paymentMethode: "wallet",
+        },
+      }
     );
 
     let c = userData.wallet - update.TotalRate;

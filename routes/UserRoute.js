@@ -19,8 +19,9 @@ import {
   BookingSummeryDetails,
   CancelBooking,
   WalletPayment,
-  BookingCompleted
+  BookingCompleted,
 } from "../controller/user/UserController.js";
+import { FetchChats , SendMessage,AllMessages ,SearchUserChat,AccessChat} from "../controller/chat/ChatController.js";
 import { userAuth } from "../middleware/AuthMiddleware.js";
 import { errorHandler } from "../middleware/ErrorHandling.js";
 
@@ -48,6 +49,12 @@ userRoute.get('/bookingsummery/:id/:active',userAuth,BookingSummeryDetails)
 userRoute.post('/bookingcancel',userAuth,CancelBooking)
 userRoute.post('/walletpayment',userAuth,WalletPayment)
 userRoute.get('/bookingcompleted/:bookingId',userAuth,BookingCompleted)
+
+userRoute.get('/fetchchat/:userId', userAuth, FetchChats);
+userRoute.get('/usersearch/:search',userAuth,SearchUserChat)
+userRoute.post('/accesschat',AccessChat)
+userRoute.post('/message',SendMessage)
+userRoute.get('/message/:chatId',AllMessages)
 
 userRoute.use(errorHandler);
 
