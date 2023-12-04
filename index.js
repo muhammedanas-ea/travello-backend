@@ -66,8 +66,8 @@ const io = new Server(server, {
       userKeys.forEach((userKey) => {
         const user = chat.users[userKey];
         const senderUserId = newMessageRecieved.sender.user
-          ? newMessageRecieved.sender.user._id
-          : newMessageRecieved.sender.owner._id;
+          ? newMessageRecieved.sender.user?._id
+          : newMessageRecieved.sender.owner?._id;
     
         if (userKey !== senderUserId) {
           console.log(user);

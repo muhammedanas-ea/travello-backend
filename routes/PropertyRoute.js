@@ -7,6 +7,7 @@ import {
 import { addProperty , ownerListProperty,propertyDetails ,bookingDetails,editPropertyDetails} from "../controller/property/PropertyController.js";
 import { errorHandler } from "../middleware/ErrorHandling.js";
 import { propertOwnerAuth } from "../middleware/AuthMiddleware.js";
+import { SearchOwnerChat,FetchOwnerChats,OwnerSendMessage} from "../controller/chat/ChatController.js";
 import upload from "../middleware/Multer.js";
 const propertyRoute = express();
 
@@ -20,6 +21,10 @@ propertyRoute.post("/editProperty",propertOwnerAuth,editPropertyDetails);
 propertyRoute.get("/listProperty/:id",propertOwnerAuth,ownerListProperty);
 propertyRoute.get("/propertydetails/:id",propertOwnerAuth,propertyDetails);
 propertyRoute.get("/bookingdetails/:id/:active",propertOwnerAuth,bookingDetails);
+
+propertyRoute.post('/message',OwnerSendMessage)
+propertyRoute.get('/fetchchat/:userId',FetchOwnerChats);
+propertyRoute.get('/ownersearch/:search',propertOwnerAuth,SearchOwnerChat)
 
 propertyRoute.use(errorHandler);
 

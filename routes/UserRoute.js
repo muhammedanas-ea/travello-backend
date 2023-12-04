@@ -50,7 +50,7 @@ userRoute.post('/bookingcancel',userAuth,CancelBooking)
 userRoute.post('/walletpayment',userAuth,WalletPayment)
 userRoute.get('/bookingcompleted/:bookingId',userAuth,BookingCompleted)
 
-userRoute.get('/fetchchat/:userId', userAuth, FetchChats);
+userRoute.get('/fetchchat/:userId',FetchChats);
 userRoute.get('/usersearch/:search',userAuth,SearchUserChat)
 userRoute.post('/accesschat',AccessChat)
 userRoute.post('/message',SendMessage)
