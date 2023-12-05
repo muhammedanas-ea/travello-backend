@@ -20,6 +20,7 @@ import {
   CancelBooking,
   WalletPayment,
   BookingCompleted,
+  AddReview
 } from "../controller/user/UserController.js";
 import { FetchChats , SendMessage,AllMessages ,SearchUserChat,AccessChat} from "../controller/chat/ChatController.js";
 import { userAuth } from "../middleware/AuthMiddleware.js";
@@ -55,6 +56,10 @@ userRoute.get('/usersearch/:search',userAuth,SearchUserChat)
 userRoute.post('/accesschat',AccessChat)
 userRoute.post('/message',SendMessage)
 userRoute.get('/message/:chatId',AllMessages)
+
+userRoute.post('/addreview',userAuth,AddReview)
+
+
 
 userRoute.use(errorHandler);
 

@@ -73,6 +73,10 @@ const PropertySchema = new Schema({
   bookings:[  {
     type: Schema.Types.ObjectId,
     ref: 'Bookings',
+  }],
+  Ratings:[{
+    type: Schema.Types.ObjectId,
+    ref: 'Rating',
   }]
 });
 

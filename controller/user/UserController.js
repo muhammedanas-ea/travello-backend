@@ -1,6 +1,7 @@
 import propertyModel from "../../models/propertyModal.js";
 import usersModel from "../../models/userModel.js";
 import bookingModel from "../../models/bookingModal.js";
+import reviewModal from "../../models/reviewModal.js";
 import mongoose from "mongoose";
 import Stripe from "stripe";
 const { ObjectId } = mongoose.Types;
@@ -114,7 +115,9 @@ export const fetchProfileData = async (req, res, next) => {
 
 export const userSinglePropertyList = async (req, res, next) => {
   try {
-    const propertyData = await propertyModel.findOne({ _id: req.params.id });
+    const propertyData = await propertyModel.findOne({ _id: req.params.id }).populate({ path: 'Ratings',populate:{
+      path:'Users'
+    }})
     return res.status(200).json({
       status: true,
       message: "singleproperty data get it",
@@ -343,6 +346,26 @@ export const BookingCompleted = async (req, res) => {
       })
       .populate("PropertyId");
     res.status(200).json(bookingData);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const AddReview = async (req, res) => {
+  try {
+    const { rating, description } = req.body.values;
+    const { userId, _id } = req.body;
+
+    const review = new reviewModal({
+      ReviewRating: rating,
+      Property: _id,
+      ReviewDescription: description,
+      Users: userId,
+    });
+    const reviewData = await review.save();
+    await propertyModel.updateOne({_id:_id},{$addToSet:{Ratings:reviewData._id}})
+
+    res.status(200).json({message:'review added successfully'})
   } catch (err) {
     console.log(err);
   }

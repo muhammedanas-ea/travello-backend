@@ -12,18 +12,16 @@ export const AccessChat = async (req, res) => {
   }
 
   try {
-    // Find a chat where the doctor's ID matches doctorId and the user's ID matches userId
     let isChat = await Chat.findOne({
       "users.owner": ownerId,
       "users.user": userId,
     })
-      .populate("users.user", "-password") // Populate the "user" references
-      .populate("users.owner", "-password") // Populate the "doctor" references
+      .populate("users.user", "-password")
+      .populate("users.owner", "-password")
       .populate("latestMessage");
     if (isChat) {
       res.status(200).json(isChat);
     } else {
-      // If a chat doesn't exist, create a new one
       const chatData = {
         chatName: "sender",
         users: {
@@ -33,8 +31,6 @@ export const AccessChat = async (req, res) => {
       };
 
       const createdChat = await Chat.create(chatData);
-
-      // Populate the "users" field in the created chat
 
       const FullChat = await Chat.findOne({ _id: createdChat._id })
         .populate("users.user", "-password")
@@ -94,7 +90,7 @@ export const SearchOwnerChat = async (req, res) => {
 export const FetchChats = async (req, res) => {
   try {
     const { userId } = req.params;
-    const result = await Chat.find({ "users.user": userId })
+    await Chat.find({ "users.user": userId })
       .populate("users.user", "-password")
       .populate("users.owner", "-password")
       .populate("latestMessage")
@@ -122,7 +118,7 @@ export const FetchChats = async (req, res) => {
 
 export const FetchOwnerChats = async (req, res) => {
   const { userId } = req.params;
-  const result = await Chat.find({ "users.owner": userId })
+  await Chat.find({ "users.owner": userId })
     .populate("users.user", "-password")
     .populate("users.owner", "-password")
     .populate("latestMessage")
@@ -218,7 +214,6 @@ export const OwnerSendMessage = async (req, res) => {
       },
       { new: true }
     );
-    console.log(message, "owner send ");
     res.json(message);
   } catch (err) {
     console.log(err);
@@ -227,11 +222,9 @@ export const OwnerSendMessage = async (req, res) => {
 
 export const AllMessages = async (req, res) => {
   try {
-    console.log(req.params.chatId);
     const message = await Message.find({ chat: req.params.chatId })
       .populate("sender.user", "name email")
       .populate("sender.owner", "name");
-      console.log(message);
     res.json(message);
   } catch (error) {
     console.log(error.message);
