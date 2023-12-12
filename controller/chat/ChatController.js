@@ -43,7 +43,6 @@ export const AccessChat = async (req, res) => {
             select: "-password",
           },
         });
-      console.log(FullChat, "full");
       res.status(200).json(FullChat);
     }
   } catch (error) {
@@ -150,7 +149,7 @@ export const SendMessage = async (req, res) => {
     }
 
     const newMessage = {
-      sender: { owner: userId },
+      sender: { user: userId },
       content: content,
       chat: chatId,
     };
@@ -190,7 +189,7 @@ export const OwnerSendMessage = async (req, res) => {
     }
 
     const newMessage = {
-      sender: { user: userId },
+      sender: { owner: userId },
       content: content,
       chat: chatId,
     };
@@ -222,9 +221,15 @@ export const OwnerSendMessage = async (req, res) => {
 
 export const AllMessages = async (req, res) => {
   try {
+    console.log();
     const message = await Message.find({ chat: req.params.chatId })
-      .populate("sender.user", "name email")
-      .populate("sender.owner", "name");
+    .populate({
+      path: 'sender',
+      populate: [
+        { path: 'user' },
+        { path: 'owner' }
+      ]
+    });
     res.json(message);
   } catch (error) {
     console.log(error.message);

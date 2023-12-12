@@ -9,6 +9,9 @@ const { ObjectId } = mongoose.Types;
 export const userPropertyList = async (req, res, next) => {
   try {
     const { active, sort, aminitesSort, search, priceFilter } = req.params;
+    const firstRange = priceFilter.split(",")[0];
+    const lastRange = priceFilter.split(",")[1];
+
     const page = (active - 1) * 6;
     let sortValue;
     let array = [];
@@ -33,7 +36,7 @@ export const userPropertyList = async (req, res, next) => {
       query.Amenities = { $all: array };
     }
 
-    query.Price = { $gt: priceFilter };
+    query.Price = { $gte: firstRange, $lte: lastRange };
 
     if (sort === "highToLow") {
       sortValue = -1;
@@ -115,13 +118,27 @@ export const fetchProfileData = async (req, res, next) => {
 
 export const userSinglePropertyList = async (req, res, next) => {
   try {
-    const propertyData = await propertyModel.findOne({ _id: req.params.id }).populate({ path: 'Ratings',populate:{
-      path:'Users'
-    }})
+    const propertyData = await propertyModel
+      .findOne({ _id: req.params.id })
+      .populate({
+        path: "Ratings",
+        populate: {
+          path: "Users",
+        },
+      });
+
+    const bookingCheck = await bookingModel.find({
+      PropertyId: req.params.id,
+      UsersId: req.body.userId,
+      CheckOut: { $lte: new Date() },
+      bookingStatus: "success",
+    });
+
     return res.status(200).json({
       status: true,
       message: "singleproperty data get it",
       propertyData,
+      bookingCheck,
     });
   } catch (err) {
     next(err);
@@ -363,9 +380,12 @@ export const AddReview = async (req, res) => {
       Users: userId,
     });
     const reviewData = await review.save();
-    await propertyModel.updateOne({_id:_id},{$addToSet:{Ratings:reviewData._id}})
+    await propertyModel.updateOne(
+      { _id: _id },
+      { $addToSet: { Ratings: reviewData._id } }
+    );
 
-    res.status(200).json({message:'review added successfully'})
+    res.status(200).json({ message: "review added successfully" });
   } catch (err) {
     console.log(err);
   }
