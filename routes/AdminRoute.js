@@ -9,7 +9,8 @@ import {
     propertBlock,
     propertUnBlock,
     viewVerifyDetails,
-    adminPropertyApprove
+    adminPropertyApprove,
+    dashboardData
 } from '../controller/admin/AdminController.js'
 
 
@@ -29,5 +30,7 @@ adminRoute.get('/propertylistadmin/:active/:search',propertyDetails)
 adminRoute.put('/propertyBlock',propertBlock)
 adminRoute.put('/propertyUnblock',propertUnBlock)
 adminRoute.get('/viewDetails/:id',viewVerifyDetails)
+
+adminRoute.get('/dashboard',dashboardData)
 
 export default adminRoute

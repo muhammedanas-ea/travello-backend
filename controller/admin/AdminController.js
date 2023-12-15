@@ -1,5 +1,6 @@
 import userModel from "../../models/userModel.js";
 import propertyModel from "../../models/propertyModal.js";
+import bookingModel from "../../models/bookingModal.js";
 import { sendMailer } from "../../utils/sendMailer.js";
 
 export const userDetails = async (req, res) => {
@@ -210,6 +211,106 @@ export const adminPropertyApprove = async (req, res) => {
         message: "send a property rejection mail",
       });
     }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const dashboardData = async (req, res) => {
+  try {
+    const totalUser = await userModel.find({ is_verified: true });
+    const totalProperty = await propertyModel.find({ Is_approve: true });
+    const startDate = new Date();
+    const firstDate = new Date(startDate);
+    firstDate.setMonth(startDate.getMonth() - 1);
+
+    const secondDate = new Date(startDate);
+    secondDate.setMonth(startDate.getMonth() - 2);
+
+    const thirdDate = new Date(startDate);
+    thirdDate.setMonth(startDate.getMonth() - 3);
+
+    const totalPrice = await bookingModel.aggregate([
+      {
+        $match: { bookingStatus: "success" },
+      },
+      {
+        $group: { _id: null, totalSales: { $sum: "$TotalRate" } },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+    ]);
+
+    const newYearSales = await bookingModel.aggregate([
+      {
+        $match: {
+          bookingStatus: "success",
+          $and: [{ Date: { $gt: firstDate } }, { Date: { $lt: startDate } }],
+        },
+      },
+      {
+        $group: { _id: null, totalSales: { $sum: "$TotalRate" } },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+    ]);
+
+    const secondYearSales = await bookingModel.aggregate([
+      {
+        $match: {
+          bookingStatus: "success",
+          $and: [{ Date: { $gt: secondDate } }, { Date: { $lt: firstDate } }],
+        },
+      },
+      {
+        $group: { _id: null, totalSales: { $sum: "$TotalRate" } },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+    ]);
+
+    const thirdYearSales = await bookingModel.aggregate([
+      {
+        $match: {
+          bookingStatus: "success",
+          $and: [{ Date: { $gt: thirdDate } }, { Date: { $lt: secondDate } }],
+        },
+      },
+      {
+        $group: { _id: null, totalSales: { $sum: "$TotalRate" } },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+    ]);
+
+    const newYearTotalSales =
+      newYearSales.length > 0 ? newYearSales[0].totalSales : 0;
+    const secondYearTotalSales =
+      secondYearSales.length > 0 ? secondYearSales[0].totalSales : 0;
+    const thirdYearTotalSales =
+      thirdYearSales.length > 0 ? thirdYearSales[0].totalSales : 0;
+
+    res.status(200).json({
+      message: "Data geting",
+      totalUser: totalUser.length,
+      totalProperty: totalProperty.length,
+      totalPrice: totalPrice[0].totalSales,
+      newYearTotalSales,
+      secondYearTotalSales,
+      thirdYearTotalSales,
+    });
   } catch (err) {
     console.log(err);
   }
