@@ -174,3 +174,64 @@ export const editPropertyDetails = async (req, res, next) => {
     next(err);
   }
 };
+
+
+export const DashboardData = async (req,res) =>{
+  try{
+    const totalSales = await propertyModel.aggregate([
+      {
+        $match: {
+          propertOwner: new ObjectId(req.params.proprtyId),
+        },
+      },
+      {
+        $lookup: {
+          from: "bookings",
+          localField: "bookings",
+          foreignField: "_id",
+          as: "details",
+        },
+      },
+      {
+        $unwind: {
+          path: "$details",
+        },
+      },
+      {
+        $group:{
+          _id:null, totalamount:{$sum:"$details.TotalRate"}
+        }
+      },{
+        $project:{
+          _id: 0
+        }
+      }
+    ])
+
+
+    const totalBooking = await propertyModel.aggregate([
+      {
+        $match: {
+          propertOwner: new ObjectId(req.params.proprtyId),
+        },
+      },
+      {
+        $lookup: {
+          from: "bookings",
+          localField: "bookings",
+          foreignField: "_id",
+          as: "details",
+        },
+      }
+    ])
+
+    const bookings = totalBooking.reduce((acc,curr) =>{
+      return curr.bookings.length+acc
+    },0)
+    console.log(bookings);
+
+    res.status(200).json({totalSales:totalSales[0].totalamount,bookings})
+  }catch(err){
+    console.log(err.message);
+  }
+}

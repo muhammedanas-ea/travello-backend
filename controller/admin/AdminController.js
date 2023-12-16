@@ -310,6 +310,9 @@ export const dashboardData = async (req, res) => {
       newYearTotalSales,
       secondYearTotalSales,
       thirdYearTotalSales,
+      startDate,
+      firstDate,
+      thirdDate
     });
   } catch (err) {
     console.log(err);

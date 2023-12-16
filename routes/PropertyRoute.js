@@ -4,7 +4,7 @@ import {
   ownerOtpVerification,
   propertyOwnerLogin,
 } from "../controller/authController/PropertyAuthController.js";
-import { addProperty , ownerListProperty,propertyDetails ,bookingDetails,editPropertyDetails} from "../controller/property/PropertyController.js";
+import { addProperty , ownerListProperty,propertyDetails ,bookingDetails,editPropertyDetails,DashboardData} from "../controller/property/PropertyController.js";
 import { errorHandler } from "../middleware/ErrorHandling.js";
 import { propertOwnerAuth } from "../middleware/AuthMiddleware.js";
 import { SearchOwnerChat,FetchOwnerChats,OwnerSendMessage} from "../controller/chat/ChatController.js";
@@ -25,6 +25,8 @@ propertyRoute.get("/bookingdetails/:id/:active",propertOwnerAuth,bookingDetails)
 propertyRoute.post('/message',OwnerSendMessage)
 propertyRoute.get('/fetchchat/:userId',FetchOwnerChats);
 propertyRoute.get('/ownersearch/:search',propertOwnerAuth,SearchOwnerChat)
+
+propertyRoute.get('/dashboard/:proprtyId',propertOwnerAuth,DashboardData)
 
 propertyRoute.use(errorHandler);
 
