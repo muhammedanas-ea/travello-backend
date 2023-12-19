@@ -1,16 +1,24 @@
 import multer from "multer";
+import { fileURLToPath } from 'url';
+import path from 'path';
 
-var storage = multer.diskStorage({
-  destination: '../frontend/public/images',
-  filename:  (req, file, cb) => {
-    cb(null, file.originalname);
+const __filename = fileURLToPath(import.meta.url); 
+const __dirname = path.dirname(__filename); 
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, path.join(__dirname, '../public'));
   },
+  filename: function (req, file, cb) {
+      const name = Date.now() + '-' + file.originalname;
+      cb(null, name);
+  }
 });
 
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 10 * 1024 * 1024,
+    fileSize: 50 * 1024 * 1024,
   },
 });
 

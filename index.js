@@ -24,6 +24,7 @@ app.use(
 );
 
 //user Route adding sedction
+app.use('/files',express.static('public'))
 app.use("/", userRoute);
 app.use("/admin", adminRoute);
 app.use("/property", propertyRoute);
