@@ -17,17 +17,17 @@ app.use(express.urlencoded({limit:'10mb', extended: true }));
 
 app.use(
   cors({
-    origin: process.env.BASE_URL,
+    origin: [process.env.BASE_URL],
     methods: ["GET", "POST", "PUT", "PATCH"],
     credentials: true,
   })
 );
 
 //user Route adding sedction
-app.use('/files',express.static('public'))
 app.use("/", userRoute);
 app.use("/admin", adminRoute);
 app.use("/property", propertyRoute);
+app.use('/files',express.static('public'))
 
 const port = process.env.port || 3000;
 const server = app.listen(port, () => {
