@@ -17,7 +17,7 @@ app.use(express.urlencoded({limit:'10mb', extended: true }));
 
 app.use(
   cors({
-    origin: [process.env.BASE_URL],
+    origin: process.env.BASE_URL,
     methods: ["GET", "POST", "PUT", "PATCH"],
     credentials: true,
   })
