@@ -5,6 +5,7 @@ import Owner from "../../models/propertyOwnerModel.js";
 import User from "../../models/userModel.js";
 
 export const AccessChat = async (req, res) => {
+  console.log('anas');
   const { userId, ownerId } = req.body;
   if (!userId) {
     console.log("User not found");

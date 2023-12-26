@@ -291,12 +291,11 @@ export const BookingSummeryDetails = async (req, res, next) => {
     const totalPages = Math.ceil(totalBooking / 5);
     return res.status(200).json({ bookingSummeryData, totalPages });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };
 
-export const CancelBooking = async (req, res) => {
+export const CancelBooking = async (req, res, next) => {
   try {
     const { userId, bookingId } = req.body;
     const bookingData = await bookingModel.findOne({ _id: bookingId });
@@ -317,11 +316,11 @@ export const CancelBooking = async (req, res) => {
         .json({ message: "Your booking has been successfully cancelled" });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const WalletPayment = async (req, res) => {
+export const WalletPayment = async (req, res, next) => {
   try {
     const { bookingId, userId } = req.body;
     const bookingData = await bookingModel.findOne({ _id: bookingId });
@@ -350,11 +349,11 @@ export const WalletPayment = async (req, res) => {
     );
     res.status(200).json({ status: true, message: "update completed" });
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const BookingCompleted = async (req, res) => {
+export const BookingCompleted = async (req, res, next) => {
   try {
     const bookingData = await bookingModel
       .findOne({
@@ -364,11 +363,11 @@ export const BookingCompleted = async (req, res) => {
       .populate("PropertyId");
     res.status(200).json(bookingData);
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const AddReview = async (req, res) => {
+export const AddReview = async (req, res, next) => {
   try {
     const { rating, description } = req.body.values;
     const { userId, _id } = req.body;
@@ -387,6 +386,6 @@ export const AddReview = async (req, res) => {
 
     res.status(200).json({ message: "review added successfully" });
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };

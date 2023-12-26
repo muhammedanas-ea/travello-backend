@@ -2,7 +2,7 @@ import userModel from "../../models/userModel.js";
 import bycrpt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-export const adminLogin = async (req, res) => {
+export const adminLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const emailExist = await userModel.findOne({ email: email });
@@ -34,6 +34,6 @@ export const adminLogin = async (req, res) => {
       }
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };

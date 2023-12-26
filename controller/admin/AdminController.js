@@ -3,7 +3,7 @@ import propertyModel from "../../models/propertyModal.js";
 import bookingModel from "../../models/bookingModal.js";
 import { sendMailer } from "../../utils/sendMailer.js";
 
-export const userDetails = async (req, res) => {
+export const userDetails = async (req, res, next) => {
   try {
     const { active, search } = req.params;
     const page = (active - 1) * 6;
@@ -34,11 +34,11 @@ export const userDetails = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const userBlock = async (req, res) => {
+export const userBlock = async (req, res, next) => {
   try {
     const id = req.body._id;
     const update = await userModel.updateOne(
@@ -54,11 +54,11 @@ export const userBlock = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const userUnblock = async (req, res) => {
+export const userUnblock = async (req, res, next) => {
   try {
     const id = req.body.id;
     const update = await userModel.updateOne(
@@ -74,22 +74,22 @@ export const userUnblock = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const verifyNotification = async (req, res) => {
+export const verifyNotification = async (req, res, next) => {
   try {
     const propertyData = await propertyModel
       .find({ Is_approve: false, Is_reject: false })
       .populate("propertOwner");
     res.status(200).json(propertyData);
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const propertyDetails = async (req, res) => {
+export const propertyDetails = async (req, res, next) => {
   try {
     const { active, search } = req.params;
     const page = (active - 1) * 6;
@@ -124,11 +124,11 @@ export const propertyDetails = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const propertBlock = async (req, res) => {
+export const propertBlock = async (req, res, next) => {
   try {
     const id = req.body._id;
     const update = await propertyModel.updateOne(
@@ -144,11 +144,11 @@ export const propertBlock = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const propertUnBlock = async (req, res) => {
+export const propertUnBlock = async (req, res, next) => {
   try {
     const id = req.body.id;
     const update = await propertyModel.updateOne(
@@ -164,22 +164,22 @@ export const propertUnBlock = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const viewVerifyDetails = async (req, res) => {
+export const viewVerifyDetails = async (req, res, next) => {
   try {
     const propertyData = await propertyModel
       .findOne({ _id: req.params.id })
       .populate("propertOwner");
     res.status(200).json({ propertyData });
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const adminPropertyApprove = async (req, res) => {
+export const adminPropertyApprove = async (req, res, next) => {
   try {
     const { verify, id } = req.body;
     if (verify) {
@@ -212,11 +212,11 @@ export const adminPropertyApprove = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };
 
-export const dashboardData = async (req, res) => {
+export const dashboardData = async (req, res, next) => {
   try {
     const totalUser = await userModel.find({ is_verified: true });
     const totalProperty = await propertyModel.find({ Is_approve: true });
@@ -312,9 +312,9 @@ export const dashboardData = async (req, res) => {
       thirdYearTotalSales,
       startDate,
       firstDate,
-      thirdDate
+      thirdDate,
     });
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 };

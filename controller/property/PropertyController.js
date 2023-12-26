@@ -152,32 +152,31 @@ export const editPropertyDetails = async (req, res, next) => {
       describe,
       amenities,
     } = req.body;
-   await propertyModel.updateOne(
+    await propertyModel.updateOne(
       { _id: propertyId },
       {
         $set: {
-          PropertyName:propertyName,
-          Price:price,
-          RoomCount:room,
-          GuestCount:gust,
-          State:state,
-          City:location,
-          PropertyType:propertyType,
-          MobileNumber:number,
-          Description:describe,
-          Amenities:amenities,
+          PropertyName: propertyName,
+          Price: price,
+          RoomCount: room,
+          GuestCount: gust,
+          State: state,
+          City: location,
+          PropertyType: propertyType,
+          MobileNumber: number,
+          Description: describe,
+          Amenities: amenities,
         },
       }
     );
-    res.status(200).json({message:'property edit completed'})
+    res.status(200).json({ message: "property edit completed" });
   } catch (err) {
     next(err);
   }
 };
 
-
-export const DashboardData = async (req,res) =>{
-  try{
+export const DashboardData = async (req, res) => {
+  try {
     const totalSales = await propertyModel.aggregate([
       {
         $match: {
@@ -198,16 +197,17 @@ export const DashboardData = async (req,res) =>{
         },
       },
       {
-        $group:{
-          _id:null, totalamount:{$sum:"$details.TotalRate"}
-        }
-      },{
-        $project:{
-          _id: 0
-        }
-      }
-    ])
-
+        $group: {
+          _id: null,
+          totalamount: { $sum: "$details.TotalRate" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+    ]);
 
     const totalBooking = await propertyModel.aggregate([
       {
@@ -222,16 +222,198 @@ export const DashboardData = async (req,res) =>{
           foreignField: "_id",
           as: "details",
         },
-      }
-    ])
+      },
+    ]);
 
-    const bookings = totalBooking.reduce((acc,curr) =>{
-      return curr.bookings.length+acc
-    },0)
-    console.log(bookings);
+    const bookings = totalBooking.reduce((acc, curr) => {
+      return curr.bookings.length + acc;
+    }, 0);
 
-    res.status(200).json({totalSales:totalSales[0].totalamount,bookings})
-  }catch(err){
+    const totalUsers = await propertyModel.aggregate([
+      {
+        $match: {
+          propertOwner: new ObjectId(req.params.proprtyId),
+        },
+      },
+      {
+        $lookup: {
+          from: "bookings",
+          localField: "bookings",
+          foreignField: "_id",
+          as: "details",
+        },
+      },
+      {
+        $unwind: "$details",
+      },
+      {
+        $group: {
+          _id: null,
+          totalUsers: {
+            $addToSet: "$details.UsersId",
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+    ]);
+
+    const uniqueUser =
+      totalUsers.length > 0 ? totalUsers[0].totalUsers.length : 0;
+
+    const startDate = new Date();
+    const firstDate = new Date(startDate);
+    firstDate.setMonth(startDate.getMonth() - 1);
+
+    const secondDate = new Date(startDate);
+    secondDate.setMonth(startDate.getMonth() - 2);
+
+    const thirdDate = new Date(startDate);
+    thirdDate.setMonth(startDate.getMonth() - 3);
+
+    const newYearSales = await propertyModel.aggregate([
+      {
+        $match: {
+          propertOwner: new ObjectId(req.params.proprtyId),
+        },
+      },
+      {
+        $lookup: {
+          from: "bookings",
+          localField: "bookings",
+          foreignField: "_id",
+          as: "details",
+        },
+      },
+      {
+        $unwind: {
+          path: "$details",
+        },
+      },
+      {
+        $match: {
+          "details.bookingStatus": "success",
+          $and: [
+            { "details.Date": { $gt: firstDate } },
+            { "details.Date": { $lt: startDate } },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalamount: { $sum: "$details.TotalRate" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+    ]);
+    const secondYearSales = await propertyModel.aggregate([
+      {
+        $match: {
+          propertOwner: new ObjectId(req.params.proprtyId),
+        },
+      },
+      {
+        $lookup: {
+          from: "bookings",
+          localField: "bookings",
+          foreignField: "_id",
+          as: "details",
+        },
+      },
+      {
+        $unwind: {
+          path: "$details",
+        },
+      },
+      {
+        $match: {
+          "details.bookingStatus": "success",
+          $and: [
+            { "details.Date": { $gt: secondDate } },
+            { "details.Date": { $lt: firstDate } },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalamount: { $sum: "$details.TotalRate" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+    ]);
+    const thirdYearSales = await propertyModel.aggregate([
+      {
+        $match: {
+          propertOwner: new ObjectId(req.params.proprtyId),
+        },
+      },
+      {
+        $lookup: {
+          from: "bookings",
+          localField: "bookings",
+          foreignField: "_id",
+          as: "details",
+        },
+      },
+      {
+        $unwind: {
+          path: "$details",
+        },
+      },
+      {
+        $match: {
+          "details.bookingStatus": "success",
+          $and: [
+            { "details.Date": { $gt: thirdDate } },
+            { "details.Date": { $lt: secondDate } },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalamount: { $sum: "$details.TotalRate" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+    ]);
+
+    const newYearTotalSales =
+      newYearSales.length > 0 ? newYearSales[0].totalamount : 0;
+    const secondYearTotalSales =
+      secondYearSales.length > 0 ? secondYearSales[0].totalamount : 0;
+    const thirdYearTotalSales =
+      thirdYearSales.length > 0 ? thirdYearSales[0].totalamount : 0;
+
+    res.status(200).json({
+      totalSales: totalSales[0].totalamount,
+      bookings,
+      uniqueUser,
+      newYearTotalSales,
+      secondYearTotalSales,
+      thirdYearTotalSales,
+      startDate,
+      firstDate,
+      thirdDate,
+    });
+  } catch (err) {
     console.log(err.message);
   }
-}
+};
