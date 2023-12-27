@@ -401,6 +401,7 @@ export const DashboardData = async (req, res) => {
       secondYearSales.length > 0 ? secondYearSales[0].totalamount : 0;
     const thirdYearTotalSales =
       thirdYearSales.length > 0 ? thirdYearSales[0].totalamount : 0;
+    
 
     res.status(200).json({
       totalSales: totalSales[0].totalamount,
@@ -417,3 +418,18 @@ export const DashboardData = async (req, res) => {
     console.log(err.message);
   }
 };
+
+export const PropertyHidden = async (req,res) =>{
+  try{
+    const {propertyId,hide} = req.body
+    if(hide === 'hideproperty'){
+      await propertyModel.updateOne({_id:propertyId},{$set:{Is_list: false}})
+      return res.status(200).json({message:'property hide completed'})
+    }else{
+      await propertyModel.updateOne({_id:propertyId},{$set:{Is_list: true}})
+      return res.status(200).json({message:'property show completed'})
+    }
+  }catch(err){
+    console.log(err)
+  }
+} 

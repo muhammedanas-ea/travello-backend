@@ -65,6 +65,10 @@ const PropertySchema = new Schema({
     type: Boolean,
     default: false,
   },
+  Is_list:{
+    type:Boolean,
+    default:false
+  },
   propertOwner:{
     type: Schema.Types.ObjectId,
     ref: 'PropertyOwner',

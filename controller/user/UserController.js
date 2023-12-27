@@ -9,21 +9,23 @@ const { ObjectId } = mongoose.Types;
 export const userPropertyList = async (req, res, next) => {
   try {
     const { active, sort, aminitesSort, search, priceFilter } = req.params;
+   
     const firstRange = priceFilter.split(",")[0];
     const lastRange = priceFilter.split(",")[1];
 
+    
     const page = (active - 1) * 6;
     let sortValue;
     let array = [];
-
+    
     const amenities = JSON.parse(aminitesSort);
-
+    
     amenities.map((item) => {
       array.push(item.value);
     });
-
-    const query = { Is_approve: true, Is_block: false };
-
+    
+    const query = { Is_approve: true, Is_block: false, Is_list: false};
+    
     if (search != 0) {
       query.$or = [
         { PropertyName: { $regex: search, $options: "i" } },
@@ -31,27 +33,29 @@ export const userPropertyList = async (req, res, next) => {
         { State: { $regex: search, $options: "i" } },
       ];
     }
-
+    
     if (Array.isArray(array) && array.length > 0) {
       query.Amenities = { $all: array };
     }
-
+    
     query.Price = { $gte: firstRange, $lte: lastRange };
-
+    
     if (sort === "highToLow") {
       sortValue = -1;
     } else if (sort === "lowToHigh") {
       sortValue = 1;
     }
-
+    
     const totalProperty = await propertyModel.countDocuments(query);
-
+    
     const propertyData = await propertyModel
       .find(query)
       .skip(page)
       .limit(9)
       .sort({ Price: sortValue });
     await bookingModel.deleteMany({ bookingStatus: "pending" });
+
+   
 
     const totalPages = Math.ceil(totalProperty / 9);
 
