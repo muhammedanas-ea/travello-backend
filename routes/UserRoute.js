@@ -20,7 +20,8 @@ import {
   CancelBooking,
   WalletPayment,
   BookingCompleted,
-  AddReview
+  AddReview,
+  PropertySwiper
 } from "../controller/user/UserController.js";
 import { FetchChats , SendMessage,AllMessages ,SearchUserChat,AccessChat} from "../controller/chat/ChatController.js";
 import { userAuth } from "../middleware/AuthMiddleware.js";
@@ -59,6 +60,7 @@ userRoute.get('/message/:chatId',AllMessages)
 
 userRoute.post('/addreview',userAuth,AddReview)
 
+userRoute.get('/propertyswiper',PropertySwiper)
 
 
 userRoute.use(errorHandler);

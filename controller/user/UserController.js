@@ -393,3 +393,14 @@ export const AddReview = async (req, res, next) => {
     next(err);
   }
 };
+
+
+export const PropertySwiper = async (req,res) =>{
+  try {
+    const query = { Is_approve: true, Is_block: false, Is_list: false};
+    const propertyData = await propertyModel.find(query)
+    res.status(200).json(propertyData) 
+  } catch (err) {
+    console.log(err)
+  }
+}
