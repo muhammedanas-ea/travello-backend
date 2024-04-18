@@ -55,6 +55,7 @@ export const verifyUser = async (req, res, next) => {
   try {
     const verifyLink = await userModel.findOne({ _id: req.params.id });
     if (!verifyLink) {
+      userModel.deleteOne({_id:req.params.id,is_verified: true})
       return res.status(400).json({ message: "link is invalid" });
     } else {
       const userToken = await tokenModel.findOne({
@@ -63,6 +64,7 @@ export const verifyUser = async (req, res, next) => {
       });
 
       if (!userToken) {
+        userModel.deleteOne({_id:req.params.id,is_verified: true})
         return res.status(400).json({
           message:
             "Your verification link may have expired. Please click on resend for verify your Email.",
