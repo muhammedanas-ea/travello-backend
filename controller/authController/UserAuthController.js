@@ -13,6 +13,9 @@ export const insertUser = async (req, res, next) => {
     const { name, email, password } = req.body;
     const sPassword = await securePassword(password);
     const emailExist = await userModel.findOne({ email: email });
+    if(emailExist.is_verified){
+      await userModel.deleteMany({is_verified:false})
+    }
 
     if (emailExist) {
       return res.status(400).json({ message: "email all ready exist" });

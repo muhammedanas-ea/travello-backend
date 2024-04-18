@@ -397,7 +397,6 @@ export const AddReview = async (req, res, next) => {
 
 export const PropertySwiper = async (req,res) =>{
   try {
-    await usersModel.deleteOne({is_verified:false})
     const query = { Is_approve: true, Is_block: false, Is_list: false};
     const propertyData = await propertyModel.find(query)
     res.status(200).json(propertyData) 
