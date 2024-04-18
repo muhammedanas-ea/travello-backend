@@ -8,14 +8,22 @@ import jwt from "jsonwebtoken";
 
 // INSERT USER SIGN UP DETAILS
 
+export const ReomveUserData = async (req, res, next) => {
+  try {
+    const remove = await userModel.deleteMany({ is_verified: false });
+    if (remove) {
+      res.status(200).json({ message: "remove compleetd" });
+    }
+  } catch (err) {
+    next();
+  }
+};
+
 export const insertUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
     const sPassword = await securePassword(password);
     const emailExist = await userModel.findOne({ email: email });
-    if(emailExist.is_verified){
-      await userModel.deleteMany({is_verified:false})
-    }
 
     if (emailExist) {
       return res.status(400).json({ message: "email all ready exist" });

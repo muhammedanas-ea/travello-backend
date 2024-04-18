@@ -7,6 +7,7 @@ import {
   userRestPassword,
   userGoogleSignUp,
   userGoogleSignin,
+  ReomveUserData,
 } from "../controller/authController/UserAuthController.js";
 import {
   userPropertyList,
@@ -31,6 +32,7 @@ const userRoute = express();
 
 //*********USER UTHENTICATION AND AUTHERASATION ROUTES
 userRoute.post("/signup", insertUser);
+userRoute.post("/remove",ReomveUserData)
 userRoute.get("/verify/:id/:token", verifyUser);
 userRoute.post("/login", userLogin);
 userRoute.post("/forgotPassword", forgotPassword);
