@@ -3,39 +3,31 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const PropertySchema = new Schema({
-  Price: {
+  price: {
     type: Number,
     required: true,
   },
-  PropertyName: {
+  productname: {
     type: String,
     required: true,
   },
-  RoomCount: {
+  brand: {
+    type: String,
+    required: true,
+  },
+  modelnumber: {
     type: Number,
     required: true,
   },
-  GuestCount: {
-    type: String,
-    required: true,
-  },
-  MobileNumber: {
+  quantity: {
     type: Number,
     required: true,
   },
-  Description: {
-    type: String,
+  waranty: {
+    type: Number,
     required: true,
   },
-  City: {
-    type: String,
-    required: true,
-  },
-  State: {
-    type: String,
-    required: true,
-  },
-  PropertyType: {
+  discrption: {
     type: String,
     required: true,
   },
@@ -44,19 +36,6 @@ const PropertySchema = new Schema({
       type: String,
     },
   ],
-  Is_block: {
-    type: Boolean,
-  },
-  Amenities: [
-    {
-      type: String,
-      required: true,
-    },
-  ],
-  Is_block: {
-    type: Boolean,
-    default:false,
-  },
   Is_approve: {
     type: Boolean,
     default: false,
@@ -65,23 +44,11 @@ const PropertySchema = new Schema({
     type: Boolean,
     default: false,
   },
-  Is_list:{
-    type:Boolean,
-    default:false
-  },
-  propertOwner:{
+  distributer_id: {
     type: Schema.Types.ObjectId,
-    ref: 'PropertyOwner',
+    ref: "distributor",
     required: true,
   },
-  bookings:[  {
-    type: Schema.Types.ObjectId,
-    ref: 'Bookings',
-  }],
-  Ratings:[{
-    type: Schema.Types.ObjectId,
-    ref: 'Rating',
-  }]
 });
 
 const Property = mongoose.model("Property", PropertySchema);

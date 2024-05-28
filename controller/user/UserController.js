@@ -113,7 +113,7 @@ export const updateUserProfile = async (req, res, next) => {
 
 export const fetchProfileData = async (req, res, next) => {
   try {
-    const userData = await usersModel.findOne({ _id: req.params.id });
+    const userData = await useModel.findOne({ _id: req.params.id });
     return res.status(200).json(userData);
   } catch (err) {
     next(err);
