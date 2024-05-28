@@ -3,31 +3,39 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const PropertySchema = new Schema({
-  price: {
+  Price: {
     type: Number,
     required: true,
   },
-  productname: {
+  PropertyName: {
     type: String,
     required: true,
   },
-  brand: {
+  RoomCount: {
+    type: Number,
+    required: true,
+  },
+  GuestCount: {
     type: String,
     required: true,
   },
-  modelnumber: {
+  MobileNumber: {
     type: Number,
     required: true,
   },
-  quantity: {
-    type: Number,
+  Description: {
+    type: String,
     required: true,
   },
-  waranty: {
-    type: Number,
+  City: {
+    type: String,
     required: true,
   },
-  discrption: {
+  State: {
+    type: String,
+    required: true,
+  },
+  PropertyType: {
     type: String,
     required: true,
   },
@@ -36,6 +44,19 @@ const PropertySchema = new Schema({
       type: String,
     },
   ],
+  Is_block: {
+    type: Boolean,
+  },
+  Amenities: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
+  Is_block: {
+    type: Boolean,
+    default:false,
+  },
   Is_approve: {
     type: Boolean,
     default: false,
@@ -44,11 +65,23 @@ const PropertySchema = new Schema({
     type: Boolean,
     default: false,
   },
-  distributer_id: {
+  Is_list:{
+    type:Boolean,
+    default:false
+  },
+  propertOwner:{
     type: Schema.Types.ObjectId,
-    ref: "distributor",
+    ref: 'PropertyOwner',
     required: true,
   },
+  bookings:[  {
+    type: Schema.Types.ObjectId,
+    ref: 'Bookings',
+  }],
+  Ratings:[{
+    type: Schema.Types.ObjectId,
+    ref: 'Rating',
+  }]
 });
 
 const Property = mongoose.model("Property", PropertySchema);
