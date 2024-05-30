@@ -29,7 +29,7 @@ const corsOpts = {
   allowedHeaders: ["Content-Type", "Authorization"],
   exposedHeaders: ["Content-Type"],
 };
-app.use(cors(corsOpts));
+app.use(cors());
 
 app.use("/files", express.static("public"));
 
