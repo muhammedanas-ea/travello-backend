@@ -8,7 +8,6 @@ export const addProperty = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     const dicout = jwt.verify(token, process.env.SECRET_KEY);
-    console.log(req.body);
     const {
       propertyName,
       price,
