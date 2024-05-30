@@ -10,24 +10,32 @@ import { Server } from "socket.io";
 const app = express();
 
 env.config();
-mongoose.connect(process.env.mongo_url);
-
-app.use(express.json({limit:'10mb'}));
-app.use(express.urlencoded({limit:'10mb', extended: true }));
-
-app.use(
-  cors({
-    origin: process.env.BASE_URL,
-    methods: ["GET", "POST", "PUT", "PATCH"],
-    credentials: true,
+mongoose
+  .connect(process.env.mongo_url)
+  .then(() => {
+    console.log("mongodb connected");
   })
-);
+  .catch((err) => {
+    console.log(err);
+  });
 
-//user Route adding sedction
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const corsOpts = {
+  origin: process.env.BASE_URL,
+  credentials: true,
+  methods: ["GET", "POST", "HEAD", "PUT", "PATCH", "DELETE"],
+  allowedHeaders: ["Content-Type"],
+  exposedHeaders: ["Content-Type"],
+};
+app.use(cors(corsOpts));
+
+app.use("/files", express.static("public"));
+
 app.use("/", userRoute);
 app.use("/admin", adminRoute);
 app.use("/property", propertyRoute);
-app.use('/files',express.static('public'))
 
 const port = process.env.port || 3000;
 const server = app.listen(port, () => {
@@ -36,7 +44,7 @@ const server = app.listen(port, () => {
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin:  process.env.BASE_URL,
+    origin: process.env.BASE_URL,
   },
 });
 io.on("connection", (socket) => {
@@ -61,14 +69,13 @@ io.on("connection", (socket) => {
     const senderUserId = newMessageRecieved.sender.user
       ? newMessageRecieved.sender.user
       : newMessageRecieved.sender.owner;
-      
 
     Object.keys(chat.users).forEach((userKey) => {
       const user = chat.users[userKey];
       if (user !== senderUserId) {
-        const access  = user.user ? user.owner : user.user;
-        console.log(access,'is get ing');
-        socket.to(access ).emit("message received", newMessageRecieved);
+        const access = user.user ? user.owner : user.user;
+        console.log(access, "is get ing");
+        socket.to(access).emit("message received", newMessageRecieved);
       }
     });
   });
