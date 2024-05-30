@@ -6,6 +6,8 @@ import userRoute from "./routes/UserRoute.js";
 import adminRoute from "./routes/AdminRoute.js";
 import propertyRoute from "./routes/PropertyRoute.js";
 import { Server } from "socket.io";
+import { corsOptions } from "./utils/config/corsOption.js";
+import { allowedOrigins } from "./utils/config/allowedOrigins.js";
 
 const app = express();
 
@@ -22,14 +24,8 @@ mongoose
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const corsOpts = {
-  origin: process.env.BASE_URL,
-  credentials: true,
-  // methods: ["GET", "POST", "HEAD", "PUT", "PATCH", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  exposedHeaders: ["Content-Type"],
-};
-app.use(cors());
+
+app.use(cors(corsOptions));
 
 app.use("/files", express.static("public"));
 
@@ -44,7 +40,7 @@ const server = app.listen(port, () => {
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: process.env.BASE_URL,
+    origin: allowedOrigins,
   },
 });
 io.on("connection", (socket) => {
