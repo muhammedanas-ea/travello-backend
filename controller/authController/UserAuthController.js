@@ -42,7 +42,7 @@ export const insertUser = async (req, res, next) => {
           token: crypto.randomBytes(32).toString("hex"),
         }).save();
 
-        const url = `https://travello-olive.vercel.app/home/${userData._id}/${token.token}`;
+        const url = `${process.env.BASE_URL}/home/${userData._id}/${token.token}`;
 
         sendMailer(userData.name, userData.email, url, "Travello verify email");
         res.status(200).json({
