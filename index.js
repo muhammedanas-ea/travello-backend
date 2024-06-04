@@ -6,7 +6,7 @@ import userRoute from "./routes/UserRoute.js";
 import adminRoute from "./routes/AdminRoute.js";
 import propertyRoute from "./routes/PropertyRoute.js";
 import { Server } from "socket.io";
-// import { corsOptions } from "./utils/config/corsOption.js";
+import { corsOptions } from "./utils/config/corsOption.js";
 import { allowedOrigins } from "./utils/config/allowedOrigins.js";
 
 const app = express();
@@ -25,9 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.use(cors({
-  origin:process.env.BASE_URL
-}));
+app.use(cors(corsOptions));
 
 app.use("/files", express.static("public"));
 
